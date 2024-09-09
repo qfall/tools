@@ -10,6 +10,7 @@
 use criterion::criterion_main;
 
 pub mod pfdh;
+pub mod psf;
 pub mod regev;
 
-criterion_main! {regev::benches, pfdh::benches}
+criterion_main! {regev::benches, pfdh::benches, psf::benches}
