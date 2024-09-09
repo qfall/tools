@@ -22,9 +22,11 @@
 //!     Homomorphic Cryptography (pp. 61-71). <https://dl.acm.org/doi/pdf/10.1145/3267973.3267975>
 
 mod gpv;
+mod gpv_perturbation;
 mod gpv_ring;
 
 pub use gpv::PSFGPV;
+pub use gpv_perturbation::PSFGPVPerturbation;
 pub use gpv_ring::PSFGPVRing;
 
 /// This trait should be implemented by all constructions that are

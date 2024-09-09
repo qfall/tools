@@ -34,6 +34,7 @@
 //!     estimates." International Conference on the Theory and Application of Cryptology and
 //!     Information Security. Berlin, Heidelberg: Springer Berlin Heidelberg, 2011.
 
+pub mod classical_bucket_sampling;
 pub mod gadget_classical;
 pub mod gadget_default;
 pub mod gadget_parameters;
