@@ -37,6 +37,7 @@ use serde::{Deserialize, Serialize};
 /// - `gp`: Describes the gadget parameters with which the G-Trapdoor is generated
 /// - `s`: The Gaussian parameter with which is sampled
 /// - `rounding_parameter`: The rounding parameter used for the discrete Gaussian
+/// - `sigma_`: TODO
 ///
 /// # Examples
 /// ```
@@ -65,7 +66,7 @@ pub struct PSFGPVPerturbation {
     pub rounding_parameter: Q,
 }
 
-impl PSF<MatZq, MatZ, MatZ, MatZq> for PSFGPVPerturbation {
+impl PSF<MatZq, (MatZ, MatQ), MatZ, MatZq> for PSFGPVPerturbation {
     /// Computes a G-Trapdoor according to the [`GadgetParameters`]
     /// defined in the struct.
     ///
@@ -79,19 +80,38 @@ impl PSF<MatZq, MatZ, MatZ, MatZq> for PSFGPVPerturbation {
     /// use qfall_crypto::primitive::psf::PSF;
     ///
     /// let psf = PSFGPVPerturbation {
-    ///     gp: GadgetParameters::init_default(8, 64),
-    ///     s: Q::from(12),
-    ///     rounding_parameter: Q::from(3)
+    ///     gp: GadgetParameters::init_default(4, 64),
+    ///     s: Q::from(18),
+    ///     rounding_parameter: Q::from(2)
     /// };
     ///
     /// let (a, td) = psf.trap_gen();
     /// ```
-    fn trap_gen(&self) -> (MatZq, MatZ) {
+    fn trap_gen(&self) -> (MatZq, (MatZ, MatQ)) {
         let a_bar = MatZq::sample_uniform(&self.gp.n, &self.gp.m_bar, &self.gp.q);
 
         let tag = MatZq::identity(&self.gp.n, &self.gp.n, &self.gp.q);
 
-        gen_trapdoor(&self.gp, &a_bar, &tag).unwrap()
+        let (a, g_trapdoor) = gen_trapdoor(&self.gp, &a_bar, &tag).unwrap();
+
+        // use `g_trapdoor` to compute actual trapdoor: `[[td],[I]]`
+        let td = g_trapdoor
+            .concat_vertical(&MatZ::identity(
+                a.get_num_columns() - g_trapdoor.get_num_rows(),
+                g_trapdoor.get_num_columns(),
+            ))
+            .unwrap();
+
+        // s^2*I - trapdoor^t * sigma_g * trapdoor
+        let sigma_p = self.s.pow(2).unwrap() * MatQ::identity(td.get_num_rows(), td.get_num_rows())
+            - MatQ::from(&(&td * &self.gp.base.clone().pow(2).unwrap() * td.transpose()));
+        // compute actual convolution matrix for the perturbation sampling
+        let convolution_matrix = (sigma_p
+            - self.rounding_parameter.pow(2).unwrap()
+                * MatQ::identity(a.get_num_columns(), a.get_num_columns()))
+        .cholesky_decomposition();
+
+        (a, (g_trapdoor, convolution_matrix))
     }
 
     /// Samples in the domain using SampleD with the standard basis and center `0`.
@@ -104,9 +124,9 @@ impl PSF<MatZq, MatZ, MatZ, MatZq> for PSFGPVPerturbation {
     /// use qfall_crypto::primitive::psf::PSF;
     ///
     /// let psf = PSFGPVPerturbation {
-    ///     gp: GadgetParameters::init_default(8, 64),
-    ///     s: Q::from(12),
-    ///     rounding_parameter: Q::from(3)
+    ///     gp: GadgetParameters::init_default(4, 64),
+    ///     s: Q::from(18),
+    ///     rounding_parameter: Q::from(2)
     /// };
     /// let (a, td) = psf.trap_gen();
     ///
@@ -156,7 +176,7 @@ impl PSF<MatZq, MatZ, MatZ, MatZq> for PSFGPVPerturbation {
     /// let preimage = psf.samp_p(&a, &td, &range_fa);
     /// assert_eq!(range_fa, psf.f_a(&a, &preimage))
     /// ```
-    fn samp_p(&self, a: &MatZq, td: &MatZ, u: &MatZq) -> MatZ {
+    fn samp_p(&self, a: &MatZq, (td, convolution_matrix): &(MatZ, MatQ), u: &MatZq) -> MatZ {
         // use `td` to compute actual G-Trapdoor: `[[td],[I]]`
         let trapdoor = td
             .concat_vertical(&MatZ::identity(
@@ -165,18 +185,9 @@ impl PSF<MatZq, MatZ, MatZ, MatZq> for PSFGPVPerturbation {
             ))
             .unwrap();
 
-        // here we assume perfect base for the modulus (otherwise it would be `base^2 +1`)
-        let sigma_g = self.gp.base.clone().pow(2).unwrap();
-        let sqrt_sigma_g = self.gp.base.clone();
-
-        // s^2*I - trapdoor^t * sigma_g * trapdoor
-        let sigma_p = self.s.pow(2).unwrap()
-            * MatQ::identity(trapdoor.get_num_rows(), trapdoor.get_num_rows())
-            - MatQ::from(&(&trapdoor * &sigma_g * trapdoor.transpose()));
-
         let perturbation = MatZ::sample_d_common_non_spherical(
             &self.gp.n,
-            &(self.rounding_parameter.pow(2).unwrap() * &sigma_p),
+            &(&self.rounding_parameter * convolution_matrix),
             &self.rounding_parameter,
         )
         .unwrap();
@@ -185,7 +196,7 @@ impl PSF<MatZq, MatZ, MatZ, MatZq> for PSFGPVPerturbation {
 
         let z: MatZ = sampling_gaussian_gadget(
             &self.gp,
-            &self.rounding_parameter * sqrt_sigma_g,
+            &self.rounding_parameter * &self.gp.base,
             &MatZ::from(&v),
         );
 

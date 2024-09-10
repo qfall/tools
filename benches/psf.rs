@@ -6,14 +6,13 @@
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
-use std::str::FromStr;
-
 use criterion::{criterion_group, Criterion};
 use qfall_crypto::{
     primitive::psf::{PSFGPVPerturbation, PSF, PSFGPV},
     sample::g_trapdoor::gadget_parameters::GadgetParameters,
 };
 use qfall_math::{integer_mod_q::MatZq, rational::Q};
+use std::str::FromStr;
 
 /// Benchmark [bench_psf] with `n = 4`.
 ///
