@@ -1,0 +1,9 @@
+[package]
+name = "psf"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+qfall-crypto = { git = "https://github.com/qfall/crypto", branch = "perturbation_sampling" }
+qfall-math = { git = "https://github.com/qfall/math", branch = "sampleD_common_non_spherical" }
+serde_json = "1.0"

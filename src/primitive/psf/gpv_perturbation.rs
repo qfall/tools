@@ -109,7 +109,7 @@ impl PSF<MatZq, (MatZ, MatQ), MatZ, MatZq> for PSFGPVPerturbation {
         let convolution_matrix = (sigma_p
             - self.rounding_parameter.pow(2).unwrap()
                 * MatQ::identity(a.get_num_columns(), a.get_num_columns()))
-        .cholesky_decomposition();
+        .cholesky_decomposition_flint();
 
         (a, (g_trapdoor, convolution_matrix))
     }
