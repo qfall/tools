@@ -197,7 +197,7 @@ impl PSF<MatZq, (MatZ, MatQ), MatZ, MatZq> for PSFGPVPerturbation {
         let z: MatZ = sampling_gaussian_gadget(
             &self.gp,
             &self.rounding_parameter * &self.gp.base,
-            &MatZ::from(&v),
+            &v.get_mat(),
         );
 
         perturbation + trapdoor * z
