@@ -102,14 +102,17 @@ impl PSF<MatZq, (MatZ, MatQ), MatZ, MatZq> for PSFGPVPerturbation {
             ))
             .unwrap();
 
-        // s^2*I - trapdoor^t * sigma_g * trapdoor
+        // `s^2*I - trapdoor^t * sigma_g * trapdoor`
+        // we have to subtract the trapdoor because we will sample a perturbation to a given solution
+        // which is sampled using `sigma_g` and then multiplied with the trapdoor
         let sigma_p = self.s.pow(2).unwrap() * MatQ::identity(td.get_num_rows(), td.get_num_rows())
             - MatQ::from(&(&td * &self.gp.base.clone().pow(2).unwrap() * td.transpose()));
-        // compute actual convolution matrix for the perturbation sampling
-        let convolution_matrix = (sigma_p
-            - self.rounding_parameter.pow(2).unwrap()
-                * MatQ::identity(a.get_num_columns(), a.get_num_columns()))
-        .cholesky_decomposition_flint();
+
+        // compute actual convolution matrix for the perturbation sampling `r * sqrt(Sigma - I) = sqrt(r^2 Sigma_p - r^2 I)`
+        // we have to subtract the `r^2 I` because the randomized rounding adds additional length for which we have to account
+        let convolution_matrix = &self.rounding_parameter
+            * (sigma_p - MatQ::identity(a.get_num_columns(), a.get_num_columns()))
+                .cholesky_decomposition_flint();
 
         (a, (g_trapdoor, convolution_matrix))
     }
@@ -185,13 +188,17 @@ impl PSF<MatZq, (MatZ, MatQ), MatZ, MatZq> for PSFGPVPerturbation {
             ))
             .unwrap();
 
+        // we sample a perturbation value with convolution `r * sqrt(Sigma_p)`
+        // the convolution matrix that is provided has to account for the additional
+        // randomized rounding that has to occure, hence it is generated in the `TrapGen`
         let perturbation = MatZ::sample_d_common_non_spherical(
             &self.gp.n,
-            &(&self.rounding_parameter * convolution_matrix),
+            &convolution_matrix,
             &self.rounding_parameter,
         )
         .unwrap();
 
+        // compute the new target vector that acocunts that includes the perturbation
         let v = u - a * &perturbation;
 
         let z: MatZ = sampling_gaussian_gadget(
@@ -220,9 +227,9 @@ impl PSF<MatZq, (MatZ, MatQ), MatZ, MatZq> for PSFGPVPerturbation {
     /// use qfall_crypto::primitive::psf::PSF;
     ///
     /// let psf = PSFGPVPerturbation {
-    ///     gp: GadgetParameters::init_default(8, 64),
-    ///     s: Q::from(12),
-    ///     rounding_parameter: Q::from(3)
+    ///     gp: GadgetParameters::init_default(4, 64),
+    ///     s: Q::from(18),
+    ///     rounding_parameter: Q::from(2)
     /// };
     /// let (a, td) = psf.trap_gen();
     /// let domain_sample = psf.samp_d();
@@ -252,9 +259,9 @@ impl PSF<MatZq, (MatZ, MatQ), MatZ, MatZq> for PSFGPVPerturbation {
     /// use qfall_math::rational::Q;
     ///
     /// let psf = PSFGPVPerturbation {
-    ///     gp: GadgetParameters::init_default(8, 64),
-    ///     s: Q::from(12),
-    ///     rounding_parameter: Q::from(3)
+    ///     gp: GadgetParameters::init_default(4, 64),
+    ///     s: Q::from(18),
+    ///     rounding_parameter: Q::from(2)
     /// };
     /// let (a, td) = psf.trap_gen();
     ///
@@ -386,7 +393,7 @@ mod test_gpv_psf_perturbation {
     #[test]
     fn check_domain_as_expected() {
         let psf = PSFGPVPerturbation {
-            gp: GadgetParameters::init_default(8, 128),
+            gp: GadgetParameters::init_default(4, 128),
             s: Q::from(20),
             rounding_parameter: Q::from(3),
         };
@@ -405,7 +412,7 @@ mod test_gpv_psf_perturbation {
     #[test]
     fn check_domain_not_in_dn() {
         let psf = PSFGPVPerturbation {
-            gp: GadgetParameters::init_default(8, 128),
+            gp: GadgetParameters::init_default(4, 128),
             s: Q::from(20),
             rounding_parameter: Q::from(3),
         };
@@ -414,8 +421,10 @@ mod test_gpv_psf_perturbation {
         let matrix = MatZ::new(a.get_num_columns(), 2);
         let too_short = MatZ::new(a.get_num_columns() - 1, 1);
         let too_long = MatZ::new(a.get_num_columns() + 1, 1);
-        let entry_too_large =
-            psf.s.round() * a.get_num_columns() * MatZ::identity(a.get_num_columns(), 1);
+        let entry_too_large = psf.rounding_parameter.round()
+            * psf.s.round()
+            * a.get_num_columns()
+            * MatZ::identity(a.get_num_columns(), 1);
 
         assert!(!psf.check_domain(&matrix));
         assert!(!psf.check_domain(&too_long));

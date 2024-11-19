@@ -1,5 +1,4 @@
 use std::{fs::File, io::Write};
-
 use qfall_crypto::{
     primitive::psf::{PSFGPVPerturbation, PSF},
     sample::g_trapdoor::gadget_parameters::GadgetParameters,
