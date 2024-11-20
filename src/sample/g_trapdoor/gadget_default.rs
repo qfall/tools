@@ -143,7 +143,10 @@ mod test_gen_trapdoor_default {
 
                 let trapdoor = r.concat_vertical(&MatZ::identity(n * k, n * k)).unwrap();
 
-                assert_eq!(gen_gadget_mat(n, k, &Z::from(2)), (a * trapdoor).get_mat())
+                assert_eq!(
+                    gen_gadget_mat(n, k, &Z::from(2)),
+                    (a * trapdoor).get_representative_0_modulus()
+                )
             }
         }
     }

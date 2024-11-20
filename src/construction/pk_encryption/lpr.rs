@@ -457,6 +457,7 @@ impl PKEncryptionScheme for LPR {
             .unwrap()
             .dot_product(cipher)
             .unwrap();
+        let result: Z = result.get_representative_around_0().abs();
 
         let q_half = Z::from(&self.q).div_floor(2);
 

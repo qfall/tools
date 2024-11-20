@@ -251,7 +251,7 @@ impl HashInto<MatPolynomialRingZq> for HashMatPolynomialRingZq {
         let highest_deg = self.modulus.get_degree();
         let embedding =
             hash_to_mat_zq_sha256(m, self.rows * highest_deg, self.cols, self.modulus.get_q())
-                .get_mat();
+                .get_representative_0_modulus();
         let poly_mat = MatPolyOverZ::from_coefficient_embedding_to_matrix(&embedding, highest_deg);
         MatPolynomialRingZq::from((&poly_mat, &self.modulus))
     }
@@ -306,6 +306,7 @@ mod tests_sha {
         let mut large = false;
         for i in 0..5 {
             if hash_to_zq_sha256(&(i.to_string() + str1), Z::from(271).pow(100).unwrap())
+                .get_representative_0_modulus()
                 .distance(Z::ZERO)
                 > Z::from(u64::MAX)
             {

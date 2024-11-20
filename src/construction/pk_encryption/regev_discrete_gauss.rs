@@ -450,6 +450,7 @@ impl PKEncryptionScheme for RegevWithDiscreteGaussianRegularity {
     /// ```
     fn dec(&self, sk: &Self::SecretKey, cipher: &Self::Cipher) -> Z {
         let result = &cipher.1 - sk.dot_product(&cipher.0).unwrap();
+        let result: Z = result.get_representative_around_0().abs();
 
         let q_half = Z::from(&self.q).div_floor(2);
 
