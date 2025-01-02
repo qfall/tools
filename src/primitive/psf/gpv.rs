@@ -148,7 +148,7 @@ impl PSF<MatZq, (MatZ, MatQ), MatZ, MatZq> for PSFGPV {
         let sol: MatZ = a
             .solve_gaussian_elimination(u)
             .unwrap()
-            .get_representative_0_modulus();
+            .get_representative_least_nonnegative_residue();
 
         let center = MatQ::from(&(-1 * &sol));
 

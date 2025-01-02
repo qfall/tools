@@ -497,7 +497,7 @@ impl PKEncryptionScheme for RingLPR {
         let mut vec = vec![];
         for i in 0..self.q.get_degree() {
             let coeff: Zq = result.get_coeff(i).unwrap();
-            let coeff: Z = coeff.get_representative_around_0().abs();
+            let coeff: Z = coeff.get_representative_least_absolute_residue().abs();
 
             if coeff.distance(&q_half) < coeff.distance(Z::ZERO) {
                 vec.push(true);

@@ -148,7 +148,7 @@ pub fn find_solution_gadget_ring(u: &PolynomialRingZq, k: &Z, base: &Z) -> MatPo
     let modulus = u.get_mod();
     let size = modulus.get_degree();
     let value = u
-        .get_representative_0_modulus()
+        .get_representative_least_nonnegative_residue()
         .into_coefficient_embedding(size);
     let value = MatZq::from((&value, modulus.get_q()));
 

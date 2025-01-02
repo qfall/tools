@@ -151,7 +151,7 @@ pub fn gen_gadget_vec(k: impl TryInto<i64> + Display, base: &Z) -> MatZ {
 /// let sol = find_solution_gadget_vec(&value, &k, &base);
 ///
 /// assert_eq!(
-///     value.get_representative_around_0(),
+///     value.get_representative_least_absolute_residue(),
 ///     (gen_gadget_vec(&k, &base).transpose() * sol)
 ///         .get_entry(0, 0)
 ///         .unwrap()
@@ -165,7 +165,7 @@ pub fn find_solution_gadget_vec(value: &Zq, k: &Z, base: &Z) -> MatZ {
         panic!("The modulus is too large, the value is potentially not representable.");
     }
 
-    let mut value = value.get_representative_0_modulus();
+    let mut value = value.get_representative_least_nonnegative_residue();
     let mut out = MatZ::new(k, 1);
     for i in 0..out.get_num_rows() {
         let val_i = value.modulo(base);
@@ -203,7 +203,7 @@ pub fn find_solution_gadget_vec(value: &Zq, k: &Z, base: &Z) -> MatZ {
 /// let sol = find_solution_gadget_mat(&value, &k, &base);
 ///
 /// assert_eq!(
-///     value.get_representative_around_0(),
+///     value.get_representative_least_absolute_residue(),
 ///     gen_gadget_mat(3, &k, &base) * sol
 /// )
 /// ```
@@ -392,7 +392,7 @@ mod test_find_solution_gadget {
             let sol = find_solution_gadget_vec(&value, &k, &base);
 
             assert_eq!(
-                value.get_representative_0_modulus(),
+                value.get_representative_least_nonnegative_residue(),
                 (gen_gadget_vec(&k, &base).transpose() * sol)
                     .get_entry(0, 0)
                     .unwrap()
@@ -410,7 +410,7 @@ mod test_find_solution_gadget {
         let sol = find_solution_gadget_mat(&value, &k, &base);
 
         assert_eq!(
-            value.get_representative_0_modulus(),
+            value.get_representative_least_nonnegative_residue(),
             gen_gadget_mat(3, &k, &base) * sol
         )
     }
