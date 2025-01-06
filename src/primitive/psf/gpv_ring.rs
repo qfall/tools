@@ -164,10 +164,10 @@ impl PSF<MatPolynomialRingZq, (MatPolyOverZ, MatPolyOverZ), MatPolyOverZ, MatPol
 
         // solve `rot^-(ι(a)) ι(x) = ι(u)` to get solution
         let u_embedded = u
-            .get_mat()
+            .get_representative_least_nonnegative_residue()
             .into_coefficient_embedding_from_matrix(self.gp.modulus.get_degree());
         let a_embedded = a
-            .get_mat()
+            .get_representative_least_nonnegative_residue()
             .into_coefficient_embedding_from_matrix(self.gp.modulus.get_degree());
         let rot_a = rot_minus_matrix(&a_embedded);
 
@@ -176,7 +176,7 @@ impl PSF<MatPolynomialRingZq, (MatPolyOverZ, MatPolyOverZ), MatPolyOverZ, MatPol
         let sol: MatZ = rot_a
             .solve_gaussian_elimination(&u_embedded)
             .unwrap()
-            .get_mat();
+            .get_representative_least_nonnegative_residue();
 
         // turn center into a vector of polynomials over Q with maximal degree as the
         // modulus

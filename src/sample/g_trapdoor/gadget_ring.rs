@@ -147,7 +147,9 @@ pub fn find_solution_gadget_ring(u: &PolynomialRingZq, k: &Z, base: &Z) -> MatPo
     let k_i64 = i64::try_from(k).unwrap();
     let modulus = u.get_mod();
     let size = modulus.get_degree();
-    let value = u.get_poly().into_coefficient_embedding(size);
+    let value = u
+        .get_representative_least_nonnegative_residue()
+        .into_coefficient_embedding(size);
     let value = MatZq::from((&value, modulus.get_q()));
 
     let classical_sol = find_solution_gadget_mat(&value, k, base);

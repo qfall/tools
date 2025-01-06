@@ -439,6 +439,7 @@ impl PKEncryptionScheme for DualRegev {
             .concat_vertical(&MatZ::identity(1, 1))
             .unwrap();
         let result: Zq = (cipher.transpose() * tmp).get_entry(0, 0).unwrap();
+        let result: Z = result.get_representative_least_absolute_residue().abs();
 
         let q_half = Z::from(&self.q).div_floor(2);
 

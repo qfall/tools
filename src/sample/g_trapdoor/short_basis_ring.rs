@@ -12,7 +12,7 @@
 use super::{gadget_parameters::GadgetParametersRing, gadget_ring::find_solution_gadget_ring};
 use qfall_math::{
     integer::{MatPolyOverZ, PolyOverZ, Z},
-    integer_mod_q::{MatPolynomialRingZq, PolyOverZq, PolynomialRingZq, Zq},
+    integer_mod_q::{MatPolynomialRingZq, PolynomialRingZq, Zq},
     traits::{
         Concatenate, GetEntry, GetNumColumns, GetNumRows, Pow, SetCoefficient, SetEntry, Tensor,
     },
@@ -73,7 +73,9 @@ pub fn gen_short_basis_for_trapdoor_ring(
     let sa_r = gen_sa_r(params, a);
     let mut basis = sa_l * sa_r;
     // the basis has to be reduced by the modulus to remove high-degrees
-    let ctx_poly = PolyOverZ::from(&PolyOverZq::from(&params.modulus));
+    let ctx_poly = params
+        .modulus
+        .get_representative_least_nonnegative_residue();
     basis.reduce_by_poly(&ctx_poly);
     basis
 }
@@ -154,7 +156,7 @@ fn compute_s(params: &GadgetParametersRing) -> MatPolyOverZ {
         // represent modulus in `base` and set last row accordingly
         let mut q = Z::from(&params.modulus.get_q());
         for i in 0..(sk.get_num_rows()) {
-            let q_i = Zq::from((&q, &params.base)).get_value();
+            let q_i = Zq::from((&q, &params.base)).get_representative_least_nonnegative_residue();
             sk.set_entry(i, sk.get_num_columns() - 1, PolyOverZ::from(&q_i))
                 .unwrap();
             q = q - q_i;
@@ -348,8 +350,8 @@ mod test_gen_sa {
         short_basis_ring::{gen_sa_l, gen_sa_r},
     };
     use qfall_math::{
-        integer::{MatPolyOverZ, MatZ, PolyOverZ},
-        integer_mod_q::{MatPolynomialRingZq, PolyOverZq},
+        integer::{MatPolyOverZ, MatZ},
+        integer_mod_q::MatPolynomialRingZq,
     };
     use std::str::FromStr;
 
@@ -405,7 +407,11 @@ mod test_gen_sa {
         let (params, a, _, _) = get_fixed_trapdoor();
         let mut sa_r = gen_sa_r(&params, &a);
 
-        sa_r.reduce_by_poly(&PolyOverZ::from(&PolyOverZq::from(&params.modulus)));
+        sa_r.reduce_by_poly(
+            &params
+                .modulus
+                .get_representative_least_nonnegative_residue(),
+        );
 
         let sa_r_cmp = MatZ::from_str(
             "[\

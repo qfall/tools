@@ -145,7 +145,10 @@ impl PSF<MatZq, (MatZ, MatQ), MatZ, MatZq> for PSFGPV {
     /// assert_eq!(range_fa, psf.f_a(&a, &preimage))
     /// ```
     fn samp_p(&self, a: &MatZq, (short_base, short_base_gso): &(MatZ, MatQ), u: &MatZq) -> MatZ {
-        let sol: MatZ = a.solve_gaussian_elimination(u).unwrap().get_mat();
+        let sol: MatZ = a
+            .solve_gaussian_elimination(u)
+            .unwrap()
+            .get_representative_least_nonnegative_residue();
 
         let center = MatQ::from(&(-1 * &sol));
 
