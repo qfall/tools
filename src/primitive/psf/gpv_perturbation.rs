@@ -193,7 +193,7 @@ impl PSF<MatZq, (MatZ, MatQ), MatZ, MatZq> for PSFGPVPerturbation {
         // randomized rounding that has to occure, hence it is generated in the `TrapGen`
         let perturbation = MatZ::sample_d_common_non_spherical(
             &self.gp.n,
-            &convolution_matrix,
+            convolution_matrix,
             &self.rounding_parameter,
         )
         .unwrap();
@@ -204,7 +204,7 @@ impl PSF<MatZq, (MatZ, MatQ), MatZ, MatZq> for PSFGPVPerturbation {
         let z: MatZ = sampling_gaussian_gadget(
             &self.gp,
             &self.rounding_parameter * &self.gp.base,
-            &v.get_mat(),
+            &v.get_representative_least_absolute_residue(),
         );
 
         perturbation + trapdoor * z
