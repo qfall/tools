@@ -8,6 +8,7 @@
 
 //! Allows to Deserialize an arbitrary [`FDH`] instantiation
 
+use super::FDH;
 use crate::{construction::hash::HashInto, primitive::psf::PSF};
 use serde::{
     de::{Error, MapAccess, Visitor},
@@ -15,7 +16,6 @@ use serde::{
 };
 use std::{fmt, marker::PhantomData};
 
-use super::FDH;
 impl<'de, A, Trapdoor, Domain, Range, T, Hash> Deserialize<'de>
     for FDH<A, Trapdoor, Domain, Range, T, Hash>
 where

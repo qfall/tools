@@ -102,10 +102,16 @@ mod test_new_anticyclic {
             let poly_mod = new_anticyclic(degree, 7).unwrap();
             let poly_zq = PolyOverZq::from(&poly_mod);
 
-            assert_eq!(Z::ONE, poly_zq.get_coeff(degree).unwrap());
-            assert_eq!(Z::ONE, poly_zq.get_coeff(0).unwrap());
+            assert_eq!(
+                Z::ONE,
+                GetCoefficient::<Z>::get_coeff(&poly_zq, degree).unwrap()
+            );
+            assert_eq!(Z::ONE, GetCoefficient::<Z>::get_coeff(&poly_zq, 0).unwrap());
             for i in 1..degree {
-                assert_eq!(Z::ZERO, poly_zq.get_coeff(i).unwrap());
+                assert_eq!(
+                    Z::ZERO,
+                    GetCoefficient::<Z>::get_coeff(&poly_zq, i).unwrap()
+                );
             }
         }
     }
@@ -162,10 +168,19 @@ mod test_new_cyclic {
             let poly_mod = new_cyclic(degree, 7).unwrap();
             let poly_zq = PolyOverZq::from(&poly_mod);
 
-            assert_eq!(Z::ONE, poly_zq.get_coeff(degree).unwrap());
-            assert_eq!(Z::from(6), poly_zq.get_coeff(0).unwrap());
+            assert_eq!(
+                Z::ONE,
+                GetCoefficient::<Z>::get_coeff(&poly_zq, degree).unwrap()
+            );
+            assert_eq!(
+                Z::from(6),
+                GetCoefficient::<Z>::get_coeff(&poly_zq, 0).unwrap()
+            );
             for i in 1..degree {
-                assert_eq!(Z::ZERO, poly_zq.get_coeff(i).unwrap());
+                assert_eq!(
+                    Z::ZERO,
+                    GetCoefficient::<Z>::get_coeff(&poly_zq, i).unwrap()
+                );
             }
         }
     }

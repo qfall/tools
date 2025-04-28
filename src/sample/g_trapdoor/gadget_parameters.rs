@@ -115,7 +115,7 @@ impl GadgetParameters {
         // [`i64`] because downstream matrices can be at most that size
         let q = q.into();
         let n: Z = n.into();
-        assert!(n >= Z::ONE && n <= Z::from(i64::MAX));
+        assert!(n >= Z::ONE && n <= i64::MAX);
 
         let base = Z::from(2);
         let log_q = Z::from(&q).log_ceil(&base).unwrap();
@@ -167,7 +167,7 @@ impl GadgetParametersRing {
         // [`i64`] because downstream matrices can be at most that size
         let q = q.into();
         let n = n.into();
-        assert!(n >= Z::ONE && n <= Z::from(i64::MAX));
+        assert!(n >= Z::ONE && n <= i64::MAX);
 
         let base = Z::from(2);
         let log_q = Z::from(&q).log_ceil(&base).unwrap();

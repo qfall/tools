@@ -15,7 +15,9 @@ use qfall_math::{
     integer::{MatPolyOverZ, PolyOverZ, Z},
     integer_mod_q::{MatPolynomialRingZq, MatZq, PolynomialRingZq},
     rational::Q,
-    traits::{Concatenate, GetEntry, IntoCoefficientEmbedding, Pow, SetCoefficient, SetEntry},
+    traits::{
+        Concatenate, IntoCoefficientEmbedding, MatrixGetEntry, MatrixSetEntry, Pow, SetCoefficient,
+    },
 };
 use std::fmt::Display;
 
@@ -175,7 +177,7 @@ mod test_gen_trapdoor_ring {
     use qfall_math::{
         integer::{MatPolyOverZ, PolyOverZ, Z},
         integer_mod_q::MatPolynomialRingZq,
-        traits::{Concatenate, GetCoefficient, GetEntry, GetNumColumns, GetNumRows, Pow},
+        traits::{Concatenate, GetCoefficient, MatrixDimensions, MatrixGetEntry, Pow},
     };
 
     /// Computes a trapdoor using the given secrets `(r,e)`
@@ -205,7 +207,7 @@ mod test_gen_trapdoor_ring {
         assert_eq!(params.k, Z::from(res.get_num_columns()));
         assert_eq!(1, res.get_num_rows());
 
-        for i in 0..(&params.k).try_into().unwrap() {
+        for i in 0..i64::try_from(&params.k).unwrap() {
             let res_entry: PolyOverZ = res.get_entry(0, i).unwrap();
             assert_eq!(res_entry.get_coeff(0).unwrap(), params.base.pow(i).unwrap())
         }

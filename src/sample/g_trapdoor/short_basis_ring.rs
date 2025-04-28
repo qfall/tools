@@ -13,9 +13,7 @@ use super::{gadget_parameters::GadgetParametersRing, gadget_ring::find_solution_
 use qfall_math::{
     integer::{MatPolyOverZ, PolyOverZ, Z},
     integer_mod_q::{MatPolynomialRingZq, PolynomialRingZq, Zq},
-    traits::{
-        Concatenate, GetEntry, GetNumColumns, GetNumRows, Pow, SetCoefficient, SetEntry, Tensor,
-    },
+    traits::*,
 };
 
 /// Generates a short basis according to [\[1\]](<../index.html#:~:text=[1]>).
@@ -177,7 +175,7 @@ mod test_gen_short_basis_for_trapdoor_ring {
         integer::PolyOverZ,
         integer_mod_q::MatPolynomialRingZq,
         rational::{MatQ, Q},
-        traits::{GetEntry, GetNumColumns, GetNumRows, Pow},
+        traits::*,
     };
 
     /// Ensure that every vector within the returned basis is in `Λ^⟂(a)`.
@@ -231,14 +229,14 @@ mod test_gen_short_basis_for_trapdoor_ring {
             let (a, r, e) = gen_trapdoor_ring_lwe(&params, &a_bar, 5).unwrap();
 
             let short_base = gen_short_basis_for_trapdoor_ring(&params, &a, &r, &e);
-            let short_base_embedded = short_base.into_coefficient_embedding_from_matrix(n);
+            let short_base_embedded = short_base.into_coefficient_embedding(n);
 
             let orthogonalized_short_basis = MatQ::from(&short_base_embedded).gso();
 
             // Compute s_1(r) and s_1(e).
             let s1_r = {
                 let mut r_max = Q::ZERO;
-                let r_embedded = r.into_coefficient_embedding_from_matrix(n);
+                let r_embedded = r.into_coefficient_embedding(n);
                 for i in 0..r_embedded.get_num_columns() {
                     let r_new = r_embedded
                         .get_column(i)
@@ -254,7 +252,7 @@ mod test_gen_short_basis_for_trapdoor_ring {
             };
             let s1_e = {
                 let mut e_max = Q::ZERO;
-                let e_embedded = e.into_coefficient_embedding_from_matrix(n);
+                let e_embedded = e.into_coefficient_embedding(n);
                 for i in 0..e_embedded.get_num_columns() {
                     let e_new = e_embedded
                         .get_column(i)
@@ -292,14 +290,14 @@ mod test_gen_short_basis_for_trapdoor_ring {
             let (a, r, e) = gen_trapdoor_ring_lwe(&params, &a_bar, 5).unwrap();
 
             let short_base = gen_short_basis_for_trapdoor_ring(&params, &a, &r, &e);
-            let short_base_embedded = short_base.into_coefficient_embedding_from_matrix(n);
+            let short_base_embedded = short_base.into_coefficient_embedding(n);
 
             let orthogonalized_short_basis = MatQ::from(&short_base_embedded).gso();
 
             // Compute s_1(r) and s_1(e).
             let s1_r = {
                 let mut r_max = Q::ZERO;
-                let r_embedded = r.into_coefficient_embedding_from_matrix(n);
+                let r_embedded = r.into_coefficient_embedding(n);
                 for i in 0..r_embedded.get_num_columns() {
                     let r_new = r_embedded
                         .get_column(i)
@@ -315,7 +313,7 @@ mod test_gen_short_basis_for_trapdoor_ring {
             };
             let s1_e = {
                 let mut e_max = Q::ZERO;
-                let e_embedded = e.into_coefficient_embedding_from_matrix(n);
+                let e_embedded = e.into_coefficient_embedding(n);
                 for i in 0..e_embedded.get_num_columns() {
                     let e_new = e_embedded
                         .get_column(i)
@@ -352,6 +350,7 @@ mod test_gen_sa {
     use qfall_math::{
         integer::{MatPolyOverZ, MatZ},
         integer_mod_q::MatPolynomialRingZq,
+        traits::IntoCoefficientEmbedding,
     };
     use std::str::FromStr;
 
@@ -441,7 +440,7 @@ mod test_gen_sa {
             [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, -1, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1]]",
         )
         .unwrap();
-        assert_eq!(sa_r_cmp, sa_r.into_coefficient_embedding_from_matrix(4));
+        assert_eq!(sa_r_cmp, sa_r.into_coefficient_embedding(4));
     }
 }
 
@@ -546,7 +545,7 @@ mod test_compute_w {
     use qfall_math::{
         integer::{MatPolyOverZ, PolyOverZ},
         integer_mod_q::MatPolynomialRingZq,
-        traits::GetNumColumns,
+        traits::MatrixDimensions,
     };
 
     /// Ensure that `gw = a[I_1|0] mod qR`.

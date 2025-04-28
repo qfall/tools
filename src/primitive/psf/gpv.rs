@@ -15,10 +15,10 @@ use crate::sample::g_trapdoor::{
     short_basis_classical::gen_short_basis_for_trapdoor,
 };
 use qfall_math::{
-    integer::{MatZ, Z},
+    integer::MatZ,
     integer_mod_q::MatZq,
     rational::{MatQ, Q},
-    traits::{GetNumRows, Pow},
+    traits::{MatrixDimensions, Pow},
 };
 use serde::{Deserialize, Serialize};
 
@@ -221,8 +221,8 @@ impl PSF<MatZq, (MatZ, MatQ), MatZ, MatZq> for PSFGPV {
     fn check_domain(&self, sigma: &MatZ) -> bool {
         let m = &self.gp.n * &self.gp.k + &self.gp.m_bar;
         sigma.is_column_vector()
-            && m == Z::from(sigma.get_num_rows())
-            && Q::from(&sigma.norm_eucl_sqrd().unwrap()) <= self.s.pow(2).unwrap() * &m
+            && m == sigma.get_num_rows()
+            && sigma.norm_eucl_sqrd().unwrap() <= self.s.pow(2).unwrap() * &m
     }
 }
 
@@ -233,7 +233,7 @@ mod test_gpv_psf {
     use crate::sample::g_trapdoor::gadget_parameters::GadgetParameters;
     use qfall_math::integer::MatZ;
     use qfall_math::rational::Q;
-    use qfall_math::traits::{GetNumColumns, GetNumRows, SetEntry};
+    use qfall_math::traits::*;
 
     /// Ensures that `samp_d` actually computes values that are in D_n.
     #[test]

@@ -15,7 +15,7 @@ use qfall_math::{
     integer::{MatZ, Z},
     integer_mod_q::{MatZq, Modulus, Zq},
     rational::Q,
-    traits::{Concatenate, Distance, GetEntry, Pow, SetEntry},
+    traits::{Concatenate, Distance, MatrixGetEntry, MatrixSetEntry, Pow},
 };
 use serde::{Deserialize, Serialize};
 
@@ -121,7 +121,7 @@ impl DualRegev {
     /// - if `n` does not fit into an [`i64`].
     pub fn new_from_n(n: impl Into<Z>) -> Self {
         let n = n.into();
-        if n < Z::from(10) {
+        if n < 10 {
             panic!("Choose n >= 10 as this function does not return parameters ensuring proper correctness of the scheme otherwise.");
         }
 
@@ -242,7 +242,7 @@ impl DualRegev {
             )));
         }
         // concentration bound with r=5 -> r * sqrt(m) * α > q/4
-        if 20 * self.m.sqrt() * &self.alpha > Q::from(q) {
+        if 20 * self.m.sqrt() * &self.alpha > q {
             return Err(MathError::InvalidIntegerInput(String::from(
                 "Correctness is not guaranteed as 5 * sqrt(m) * α > q/4, but 5 * sqrt(m) * α <= q/4 is required."
             )));
@@ -384,7 +384,7 @@ impl PKEncryptionScheme for DualRegev {
     /// ```
     fn enc(&self, pk: &Self::PublicKey, message: impl Into<Z>) -> Self::Cipher {
         // generate message = message mod 2
-        let message: Z = message.into().modulo(2);
+        let message: Z = message.into() % 2;
 
         // s <- Z_q^n
         let vec_s_t = MatZq::sample_uniform(1, &self.n, &self.q);

@@ -86,7 +86,7 @@ impl CCSfromIBE<DualRegevIBE, PFDH<MatZq, (MatZ, MatQ), MatZ, MatZq, PSFGPV, Has
     pub fn init_dr_pfdh_from_n(n: impl Into<Z>) -> Self {
         let n = n.into();
         assert!(
-            n > Z::from(3),
+            n > 3,
             "n needs to be chosen larger than 3 for this function to work properly."
         );
 

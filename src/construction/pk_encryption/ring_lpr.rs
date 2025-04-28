@@ -121,7 +121,7 @@ impl RingLPR {
     pub fn new_from_n(n: impl Into<Z>) -> Self {
         let n = n.into();
         assert!(
-            n >= Z::from(10),
+            n >= 10,
             "Choose n >= 10 as this function does not return parameters ensuring proper correctness of the scheme otherwise."
         );
 
@@ -241,7 +241,7 @@ impl RingLPR {
             which is required for the correctness of this scheme.",
         );
         if let Some((root, _)) = result {
-            if root != Z::from(2) {
+            if root != 2 {
                 return Err(MathError::InvalidIntegerInput(err_msg));
             }
         } else {
@@ -422,7 +422,7 @@ impl PKEncryptionScheme for RingLPR {
     fn enc(&self, pk: &Self::PublicKey, message: impl Into<Z>) -> Self::Cipher {
         // ensure mu has at most n bits
         let message: Z = message.into().abs();
-        let mu = message.modulo(Z::from(2).pow(&self.n).unwrap());
+        let mu = message % Z::from(2).pow(&self.n).unwrap();
         // set mu_q_half to polynomial with n {0,1} coefficients
         let mu_q_half = self.z_into_polynomialringzq(&mu);
 

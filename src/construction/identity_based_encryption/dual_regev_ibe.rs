@@ -24,7 +24,7 @@ use qfall_math::{
     integer::{MatZ, Z},
     integer_mod_q::{MatZq, Modulus},
     rational::{MatQ, Q},
-    traits::{Concatenate, GetNumRows, Pow},
+    traits::{Concatenate, MatrixDimensions, Pow},
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -118,7 +118,7 @@ impl DualRegevIBE {
     /// ```
     pub fn new_from_n(n: impl Into<Z>) -> Self {
         let n: Z = n.into();
-        if n < Z::from(2) {
+        if n < 2 {
             panic!("Security parameter n has to be larger than 1");
         }
 
@@ -202,7 +202,7 @@ impl DualRegevIBE {
         }
 
         // m >= (n + 1) * log(q)
-        if Q::from(&self.dual_regev.m) <= (&self.dual_regev.n + 1) * &q.log(2).unwrap() {
+        if self.dual_regev.m <= (&self.dual_regev.n + 1) * &q.log(2).unwrap() {
             return Err(MathError::InvalidIntegerInput(String::from(
                 "Security is not guaranteed as m <= (n + 1) * log(q), \
                 but m > (n + 1) * log(q) is required.",

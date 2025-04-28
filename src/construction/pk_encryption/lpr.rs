@@ -15,7 +15,7 @@ use qfall_math::{
     integer::Z,
     integer_mod_q::{MatZq, Modulus, Zq},
     rational::Q,
-    traits::{Concatenate, Distance, GetEntry, Pow, SetEntry},
+    traits::{Concatenate, Distance, MatrixGetEntry, MatrixSetEntry, Pow},
 };
 use serde::{Deserialize, Serialize};
 
@@ -114,7 +114,7 @@ impl LPR {
     pub fn new_from_n(n: impl Into<Z>) -> Self {
         let n = n.into();
         assert!(
-            n >= Z::from(10),
+            n >= 10,
             "Choose n >= 10 as this function does not return parameters ensuring proper correctness of the scheme otherwise."
         );
 
@@ -393,7 +393,7 @@ impl PKEncryptionScheme for LPR {
     /// ```
     fn enc(&self, pk: &Self::PublicKey, message: impl Into<Z>) -> Self::Cipher {
         // generate message = message mod 2
-        let message: Z = message.into().modulo(2);
+        let message: Z = message.into() % 2;
 
         // x <- χ^n
         let vec_r = MatZq::sample_discrete_gauss(
