@@ -115,7 +115,7 @@ impl PSF<MatPolynomialRingZq, (MatPolyOverZ, MatPolyOverZ), MatPolyOverZ, MatPol
     fn samp_d(&self) -> MatPolyOverZ {
         let dimension = self.gp.modulus.get_degree() * (&self.gp.k + 2);
         let sample = MatZ::sample_d_common(dimension, &self.gp.n, &self.s).unwrap();
-        MatPolyOverZ::from_coefficient_embedding((&sample, self.gp.modulus.get_degree()))
+        MatPolyOverZ::from_coefficient_embedding((&sample, self.gp.modulus.get_degree() - 1))
     }
 
     /// Samples an `e` in the domain using SampleD with a short basis that is generated
@@ -198,7 +198,7 @@ impl PSF<MatPolynomialRingZq, (MatPolyOverZ, MatPolyOverZ), MatPolyOverZ, MatPol
             center_embedded.push(embedded_sub_mat);
         }
 
-        MatPolyOverZ::from_coefficient_embedding((&sol, self.gp.modulus.get_degree()))
+        MatPolyOverZ::from_coefficient_embedding((&sol, self.gp.modulus.get_degree() - 1))
             + MatPolyOverZ::sample_d(
                 &short_basis,
                 self.gp.modulus.get_degree(),

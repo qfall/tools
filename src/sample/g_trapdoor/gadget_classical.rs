@@ -136,12 +136,8 @@ pub fn gen_gadget_vec(k: impl TryInto<i64> + Display, base: &Z) -> MatZ {
 ///
 /// # Examples
 /// ```
-/// use qfall_math::integer::Z;
-/// use qfall_math::integer_mod_q::Zq;
-/// use qfall_math::integer::MatZ;
-/// use qfall_crypto::sample::g_trapdoor::gadget_classical::find_solution_gadget_vec;
-/// use qfall_crypto::sample::g_trapdoor::gadget_classical::gen_gadget_vec;
-/// use qfall_math::traits::GetEntry;
+/// use qfall_math::{integer::{Z, MatZ}, integer_mod_q::Zq, traits::MatrixGetEntry};
+/// use qfall_crypto::sample::g_trapdoor::gadget_classical::{find_solution_gadget_vec, gen_gadget_vec};
 /// use std::str::FromStr;
 ///
 /// let k = Z::from(5);

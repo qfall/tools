@@ -253,7 +253,7 @@ impl HashInto<MatPolynomialRingZq> for HashMatPolynomialRingZq {
         let embedding =
             hash_to_mat_zq_sha256(m, self.rows * highest_deg, self.cols, self.modulus.get_q())
                 .get_representative_least_nonnegative_residue();
-        let poly_mat = MatPolyOverZ::from_coefficient_embedding((&embedding, highest_deg));
+        let poly_mat = MatPolyOverZ::from_coefficient_embedding((&embedding, highest_deg - 1));
         MatPolynomialRingZq::from((&poly_mat, &self.modulus))
     }
 }
