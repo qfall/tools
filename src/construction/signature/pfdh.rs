@@ -35,10 +35,10 @@ pub mod serialize;
 ///
 /// Attributes
 /// - `psf`: The PSF which has to implement the [`PSF`] trait and must also be
-///     (de-)serializable.
+///   (de-)serializable.
 /// - `hash`: The hash-function which has to map a string into the correct domain.
 /// - `randomness_length`: The length of the salt that is added to the string before
-///     hashing.
+///   hashing.
 ///
 /// # Example
 /// ## Signature Scheme from [`PSFGPV`](crate::primitive::psf::PSFGPV)

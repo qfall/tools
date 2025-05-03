@@ -30,7 +30,7 @@ use serde::{Deserialize, Serialize};
 /// - `r`: specifies the Gaussian parameter used for SampleD,
 ///   i.e. used for encryption
 /// - `alpha`: specifies the Gaussian parameter used for independent
-///     sampling from the discrete Gaussian distribution
+///   sampling from the discrete Gaussian distribution
 ///
 /// # Examples
 /// ```
@@ -77,7 +77,7 @@ impl DualRegevWithDiscreteGaussianRegularity {
     /// - `r`: specifies the Gaussian parameter used for SampleD,
     ///   i.e. used for encryption
     /// - `alpha`: specifies the Gaussian parameter used for independent
-    ///     sampling from the discrete Gaussian distribution
+    ///   sampling from the discrete Gaussian distribution
     ///
     /// Returns a [`DualRegevWithDiscreteGaussianRegularity`] PK encryption instance.
     ///
@@ -236,8 +236,8 @@ impl DualRegevWithDiscreteGaussianRegularity {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     correct DualRegevWithDiscreteGaussianRegularity public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   correct DualRegevWithDiscreteGaussianRegularity public key encryption instance.
     pub fn check_correctness(&self) -> Result<(), MathError> {
         let q: Z = Z::from(&self.q);
 
@@ -285,8 +285,8 @@ impl DualRegevWithDiscreteGaussianRegularity {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     secure DualRegevWithDiscreteGaussianRegularity public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   secure DualRegevWithDiscreteGaussianRegularity public key encryption instance.
     pub fn check_security(&self) -> Result<(), MathError> {
         let q: Z = Z::from(&self.q);
 
@@ -383,7 +383,7 @@ impl PKEncryptionScheme for DualRegevWithDiscreteGaussianRegularity {
     /// - vec_x <- χ^m, x <- χ
     /// - p = A^t * s + vec_x
     /// - c = u^t * s + x + message *  ⌊q/2⌋
-    ///     where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
+    ///   where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
     ///
     /// Then, `cipher = (p, c)` is returned.
     ///

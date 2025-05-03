@@ -22,7 +22,7 @@ use std::fmt::Display;
 /// - Generates the gadget matrix: `G`
 /// - Samples the trapdoor `R` from the specified distribution in `params`
 /// - Outputs `([a_bar | tag * g - a_bar * r], r)` as a tuple of `(A,R)`,
-///     where `R` defines a trapdoor for `A`.
+///   where `R` defines a trapdoor for `A`.
 ///
 /// Parameters:
 /// - `params`: all gadget parameters which are required to generate the trapdoor
@@ -46,9 +46,9 @@ use std::fmt::Display;
 ///
 /// # Errors and Failures
 /// - Returns a [`MathError`] of type [`MismatchingMatrixDimension`](MathError::MismatchingMatrixDimension)
-///     if the matrices can not be concatenated due to mismatching dimensions.
+///   if the matrices can not be concatenated due to mismatching dimensions.
 /// - Returns a [`MathError`] of type [`MismatchingModulus`](MathError::MismatchingModulus)
-///     if the matrices can not be concatenated due to mismatching moduli.
+///   if the matrices can not be concatenated due to mismatching moduli.
 ///
 /// # Panics ...
 /// - if `params.k < 1` or it does not fit into an [`i64`].

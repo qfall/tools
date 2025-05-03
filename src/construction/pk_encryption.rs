@@ -13,25 +13,25 @@
 //! The main references are listed in the following
 //! and will be further referenced in submodules by these numbers:
 //! - \[1\] Peikert, Chris (2016).
-//!     A decade of lattice cryptography.
-//!     In: Theoretical Computer Science 10.4.
-//!     <https://web.eecs.umich.edu/~cpeikert/pubs/lattice-survey.pdf>
+//!   A decade of lattice cryptography.
+//!   In: Theoretical Computer Science 10.4.
+//!   <https://web.eecs.umich.edu/~cpeikert/pubs/lattice-survey.pdf>
 //! - \[2\] Gentry, Craig and Peikert, Chris and Vaikuntanathan, Vinod (2008).
-//!     Trapdoors for hard lattices and new cryptographic constructions.
-//!     In: Proceedings of the fortieth annual ACM symposium on Theory of computing.
-//!     <https://dl.acm.org/doi/pdf/10.1145/1374376.1374407>
+//!   Trapdoors for hard lattices and new cryptographic constructions.
+//!   In: Proceedings of the fortieth annual ACM symposium on Theory of computing.
+//!   <https://dl.acm.org/doi/pdf/10.1145/1374376.1374407>
 //! - \[3\] Regev, Oded (2009).
-//!     On lattices, learning with errors, random linear codes, and cryptography.
-//!     In: Journal of the ACM 6.
-//!     <https://dl.acm.org/doi/pdf/10.1145/1568318.1568324>
+//!   On lattices, learning with errors, random linear codes, and cryptography.
+//!   In: Journal of the ACM 6.
+//!   <https://dl.acm.org/doi/pdf/10.1145/1568318.1568324>
 //! - \[4\] Lindner, R., and C. Peikert (2011).
-//!     Better key sizes (and attacks) for LWE-based encryption.
-//!     In: Topics in Cryptology -  RSA Conference 2011, Springer.
-//!     <https://eprint.iacr.org/2010/613.pdf>
+//!   Better key sizes (and attacks) for LWE-based encryption.
+//!   In: Topics in Cryptology -  RSA Conference 2011, Springer.
+//!   <https://eprint.iacr.org/2010/613.pdf>
 //! - \[5\] Canetti, R., Halevi, S., and Katz, J. (2004).
-//!     Chosen-ciphertext security from identity-based encryption.
-//!     In: Advances in Cryptology - EUROCRYPT 2004.
-//!     <https://link.springer.com/content/pdf/10.1007/b97182.pdf>
+//!   Chosen-ciphertext security from identity-based encryption.
+//!   In: Advances in Cryptology - EUROCRYPT 2004.
+//!   <https://link.springer.com/content/pdf/10.1007/b97182.pdf>
 
 mod ccs_from_ibe;
 mod dual_regev;
@@ -148,7 +148,7 @@ pub trait GenericMultiBitEncryption: PKEncryptionScheme {
     /// Parameters:
     /// - `sk`: specifies the secret key used for decryption
     /// - `cipher`: specifies a slice of ciphers containing several [`PKEncryptionScheme::Cipher`] instances
-    ///     to be decrypted
+    ///   to be decrypted
     ///
     /// Returns the decryption of `cipher` as a [`Z`] instance.
     fn dec_multiple_bits(&self, sk: &Self::SecretKey, cipher: &[Self::Cipher]) -> Z {

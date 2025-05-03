@@ -66,7 +66,7 @@ impl SISHash {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if `n <= 0`.
+    ///   if `n <= 0`.
     pub fn gen(n: impl Into<Z>, m: impl Into<Z>, q: impl Into<Z>) -> Result<Self, MathError> {
         let n: Z = n.into();
         let m: Z = m.into();
@@ -100,8 +100,8 @@ impl SISHash {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if `m < n log q`, or `q <= ⌈sqrt(n log q)⌉`
-    ///     as collision-resistance would otherwise not be ensured.
+    ///   if `m < n log q`, or `q <= ⌈sqrt(n log q)⌉`
+    ///   as collision-resistance would otherwise not be ensured.
     pub fn check_security(&self) -> Result<(), MathError> {
         let n: Z = self.key.get_num_rows().into();
         let m: Z = self.key.get_num_columns().into();

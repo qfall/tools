@@ -26,8 +26,8 @@ use std::fmt::Display;
 /// - Generates the gadget matrix: `G`
 /// - Samples the trapdoor `R` from the specified distribution in `params`
 /// - Outputs
-///     `([1 | a_bar | g_1 - (a_bar * r_1 + e_1) | ... | g_k - (a_bar * r_k + e_k) ], r, e)`
-///     as a tuple of `(A,R)`, where `R` defines a trapdoor for `A`.
+///   `([1 | a_bar | g_1 - (a_bar * r_1 + e_1) | ... | g_k - (a_bar * r_k + e_k) ], r, e)`
+///   as a tuple of `(A,R)`, where `R` defines a trapdoor for `A`.
 ///
 /// Parameters:
 /// - `params`: all gadget parameters which are required to generate the trapdoor
@@ -51,9 +51,9 @@ use std::fmt::Display;
 ///
 /// # Errors and Failures
 /// - Returns a [`MathError`] of type [`MismatchingMatrixDimension`](MathError::MismatchingMatrixDimension)
-///     if the matrices can not be concatenated due to mismatching dimensions.
+///   if the matrices can not be concatenated due to mismatching dimensions.
 /// - Returns a [`MathError`] of type [`OutOfBounds`](MathError::OutOfBounds)
-///     if row or column are greater than the matrix size.
+///   if row or column are greater than the matrix size.
 ///
 /// # Panics ...
 /// - if `params.k < 1` or it does not fit into an [`i64`].

@@ -26,10 +26,10 @@ use qfall_math::{
 /// - `W' := [X^0 | X^1 | ... | X^{n-1}] ⊗ W`,
 /// - `I_2' := [X^0 | X^1 | ... | X^{n-1}] ⊗ I_2` and
 /// - `S':= [X^0 | X^1 | ... | X^{n-1}] ⊗ S`.
-///     Here `W` is a solution of `g^t W = -A [ I_2 | 0 ] mod q`,
-///     `S` is a reordered (if `base^k=q` then reversed, otherwise the same as before)
-///     short base of `Λ^⟂(g^t)`, i.e. `S''` is a reordered short base of `g^t`
-///     in the classical case and `S':= [X^0 | X^1 | ... | X^{n-1}] ⊗ S''`.
+///   Here `W` is a solution of `g^t W = -A [ I_2 | 0 ] mod q`,
+///   `S` is a reordered (if `base^k=q` then reversed, otherwise the same as before)
+///   short base of `Λ^⟂(g^t)`, i.e. `S''` is a reordered short base of `g^t`
+///   in the classical case and `S':= [X^0 | X^1 | ... | X^{n-1}] ⊗ S''`.
 ///
 /// The appropriate reordering comes from
 /// [\[1\]](<../index.html#:~:text=[1]>) and Lemma 3.2 from

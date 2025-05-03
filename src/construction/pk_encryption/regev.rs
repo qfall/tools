@@ -27,7 +27,7 @@ use serde::{Deserialize, Serialize};
 /// - `m`: defines the dimension of the underlying lattice
 /// - `q`: specifies the modulus over which the encryption is computed
 /// - `alpha`:  specifies the Gaussian parameter used for independent
-///     sampling from the discrete Gaussian distribution
+///   sampling from the discrete Gaussian distribution
 ///
 /// # Examples
 /// ```
@@ -71,7 +71,7 @@ impl Regev {
     /// - `m`: specifies the number of columns of matrix `A`
     /// - `q`: specifies the modulus
     /// - `alpha`:  specifies the Gaussian parameter used for independent
-    ///     sampling from the discrete Gaussian distribution
+    ///   sampling from the discrete Gaussian distribution
     ///
     /// Returns a [`Regev`] PK encryption instance.
     ///
@@ -224,8 +224,8 @@ impl Regev {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     correct Regev public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   correct Regev public key encryption instance.
     pub fn check_correctness(&self) -> Result<(), MathError> {
         let q = Z::from(&self.q);
 
@@ -272,8 +272,8 @@ impl Regev {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     secure Regev public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   secure Regev public key encryption instance.
     pub fn check_security(&self) -> Result<(), MathError> {
         let q = Z::from(&self.q);
 
@@ -336,7 +336,7 @@ impl PKEncryptionScheme for Regev {
     /// - e^t <- χ^m
     /// - b^t = s^t * A + e^t
     /// - A = [A^t | b]^t
-    ///     where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
+    ///   where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
     ///
     /// Then, `pk = A` and `sk = s` of type [`MatZq`] are returned.
     ///

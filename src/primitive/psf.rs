@@ -12,14 +12,14 @@
 //! The main references are listed in the following
 //! and will be further referenced in submodules by these numbers:
 //! - \[1\] Micciancio, D., Peikert, C. (2012).
-//!     Trapdoors for Lattices: Simpler, Tighter, Faster, Smaller.
-//!     In: Pointcheval, D., Johansson, T. (eds) Advances in Cryptology – EUROCRYPT 2012.
-//!     EUROCRYPT 2012. Lecture Notes in Computer Science, vol 7237.
-//!     Springer, Berlin, Heidelberg. <https://doi.org/10.1007/978-3-642-29011-4_41>
+//!   Trapdoors for Lattices: Simpler, Tighter, Faster, Smaller.
+//!   In: Pointcheval, D., Johansson, T. (eds) Advances in Cryptology – EUROCRYPT 2012.
+//!   EUROCRYPT 2012. Lecture Notes in Computer Science, vol 7237.
+//!   Springer, Berlin, Heidelberg. <https://doi.org/10.1007/978-3-642-29011-4_41>
 //! - \[2\] Gür, K.D., Polyakov, Y., Rohloff, K., Ryan, G.W. and Savas, E., 2018,
-//!     January. Implementation and evaluation of improved Gaussian sampling for lattice
-//!     trapdoors. In Proceedings of the 6th Workshop on Encrypted Computing & Applied
-//!     Homomorphic Cryptography (pp. 61-71). <https://dl.acm.org/doi/pdf/10.1145/3267973.3267975>
+//!   January. Implementation and evaluation of improved Gaussian sampling for lattice
+//!   trapdoors. In Proceedings of the 6th Workshop on Encrypted Computing & Applied
+//!   Homomorphic Cryptography (pp. 61-71). <https://dl.acm.org/doi/pdf/10.1145/3267973.3267975>
 
 mod gpv;
 mod gpv_ring;

@@ -27,7 +27,7 @@ use serde::{Deserialize, Serialize};
 /// - `m`: defines the dimension of the underlying lattice
 /// - `q`: specifies the modulus over which the encryption is computed
 /// - `alpha`:  specifies the Gaussian parameter used for independent
-///     sampling from the discrete Gaussian distribution
+///   sampling from the discrete Gaussian distribution
 ///
 /// # Examples
 /// ```
@@ -71,7 +71,7 @@ impl DualRegev {
     /// - `m`: specifies the number of columns of matrix `A`
     /// - `q`: specifies the modulus
     /// - `alpha`:  specifies the Gaussian parameter used for independent
-    ///     sampling from the discrete Gaussian distribution
+    ///   sampling from the discrete Gaussian distribution
     ///
     /// Returns [`DualRegev`] PK encryption instance.
     ///
@@ -223,8 +223,8 @@ impl DualRegev {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     correct Dual Regev public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   correct Dual Regev public key encryption instance.
     pub fn check_correctness(&self) -> Result<(), MathError> {
         let q = Z::from(&self.q);
 
@@ -271,8 +271,8 @@ impl DualRegev {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     secure Dual Regev public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   secure Dual Regev public key encryption instance.
     pub fn check_security(&self) -> Result<(), MathError> {
         let q = Z::from(&self.q);
 
@@ -364,7 +364,7 @@ impl PKEncryptionScheme for DualRegev {
     /// - s <- Z_q^n
     /// - e <- χ^(m+1)
     /// - c^t = s^t * A + e^t + [0^{1xn} | msg *  ⌊q/2⌋]
-    ///     where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
+    ///   where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
     ///
     /// Then, the ciphertext `c` is returned as a vector of type [`MatZq`].
     ///

@@ -34,7 +34,7 @@ use std::fmt::Display;
 ///
 /// # Errors and Failures
 /// - Returns a [`MathError`] of type [`OutOfBounds`](MathError::OutOfBounds) if
-///     the `n` is negative or it does not fit into an [`i64`].
+///   the `n` is negative or it does not fit into an [`i64`].
 ///
 /// # Panics ...
 /// - if the `q` is not larger than `1`.
@@ -65,7 +65,7 @@ pub fn new_anticyclic(
 ///
 /// # Errors and Failures
 /// - Returns a [`MathError`] of type [`OutOfBounds`](MathError::OutOfBounds) if
-///     the `n` is negative or it does not fit into an [`i64`].
+///   the `n` is negative or it does not fit into an [`i64`].
 ///
 /// # Panics ...
 /// - if the `q` is not larger than `1`.
