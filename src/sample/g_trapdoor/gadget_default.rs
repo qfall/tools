@@ -105,7 +105,7 @@ mod test_gen_trapdoor_default {
     use crate::sample::g_trapdoor::gadget_classical::gen_gadget_mat;
     use qfall_math::{
         integer::{MatZ, Z},
-        traits::{Concatenate, GetNumColumns, GetNumRows, Pow},
+        traits::{Concatenate, MatrixDimensions, Pow},
     };
 
     /// Ensures that the default parameters are used correctly and the expected

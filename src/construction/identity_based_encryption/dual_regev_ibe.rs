@@ -24,7 +24,7 @@ use qfall_math::{
     integer::{MatZ, Z},
     integer_mod_q::{MatZq, Modulus},
     rational::{MatQ, Q},
-    traits::{Concatenate, GetNumRows, Pow},
+    traits::{Concatenate, MatrixDimensions, Pow},
 };
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -37,7 +37,7 @@ use std::collections::HashMap;
 /// - `dual_regev`: a [`DualRegev`] instance with fitting parameters `n`, `m`, `q`, `alpha`
 /// - `psf`: specifies the PSF used for extracting secret keys
 /// - `storage`: is a [`HashMap`] which stores all previously computed secret keys
-///     corresponding to their identities
+///   corresponding to their identities
 ///
 /// # Examples
 /// ```
@@ -118,7 +118,7 @@ impl DualRegevIBE {
     /// ```
     pub fn new_from_n(n: impl Into<Z>) -> Self {
         let n: Z = n.into();
-        if n < Z::from(2) {
+        if n < 2 {
             panic!("Security parameter n has to be larger than 1");
         }
 
@@ -181,8 +181,8 @@ impl DualRegevIBE {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     secure Dual Regev public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   secure Dual Regev public key encryption instance.
     pub fn check_security(&self) -> Result<(), MathError> {
         let q = Q::from(&self.dual_regev.q);
 
@@ -202,7 +202,7 @@ impl DualRegevIBE {
         }
 
         // m >= (n + 1) * log(q)
-        if Q::from(&self.dual_regev.m) <= (&self.dual_regev.n + 1) * &q.log(2).unwrap() {
+        if self.dual_regev.m <= (&self.dual_regev.n + 1) * &q.log(2).unwrap() {
             return Err(MathError::InvalidIntegerInput(String::from(
                 "Security is not guaranteed as m <= (n + 1) * log(q), \
                 but m > (n + 1) * log(q) is required.",
@@ -234,8 +234,8 @@ impl DualRegevIBE {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     correct Dual Regev IBE public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   correct Dual Regev IBE public key encryption instance.
     pub fn check_correctness(&self) -> Result<(), MathError> {
         if self.dual_regev.n <= Z::ONE {
             return Err(MathError::InvalidIntegerInput(String::from(
@@ -308,9 +308,9 @@ impl IBEScheme for DualRegevIBE {
     /// Parameters:
     /// - `master_pk`: The master public key for the encryption scheme
     /// - `master_sk`: Zhe master secret key of the encryption scheme, namely
-    ///     the trapdoor for the [`PSF`]
+    ///   the trapdoor for the [`PSF`]
     /// - `identity`: The identity, for which the corresponding secret key
-    ///     should be returned
+    ///   should be returned
     ///
     /// Returns the corresponding secret key of `identity` under public key
     /// `master_pk`.

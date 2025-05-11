@@ -30,7 +30,7 @@ use serde::{Deserialize, Serialize};
 /// - `n`: the security parameter
 /// - `k`: the size of the gadget vector: mostly taken as `log_base(q)`
 /// - `m_bar`: has to be chose appropriately for regularity and for
-///     the distribution to be sub-Gaussian
+///   the distribution to be sub-Gaussian
 /// - `base`: the base with which the gadget-vector and matrix are generated
 /// - `q`: the modulus
 /// - `distribution`: the distribution from which the matrix `A_bar` is sampled
@@ -59,7 +59,7 @@ pub struct GadgetParameters {
 /// - `n`: the security parameter
 /// - `k`: the size of the gadget vector: mostly taken as `log_base(q)`
 /// - `m_bar`: has to be chose appropriately for regularity and for
-///     the distribution to be sub-Gaussian
+///   the distribution to be sub-Gaussian
 /// - `base`: the base with which the gadget-vector and matrix are generated
 /// - `modulus`: holds the modulus q and the polynomial that is used for reduction
 /// - `distribution`: the distribution from which the matrix `A_bar` is sampled
@@ -86,13 +86,13 @@ impl GadgetParameters {
     ///
     /// - `base = 2` is taken from [\[1\]](<../index.html#:~:text=[1]>): Theorem 1.
     /// - `k = log_2_ceil(q)` is taken from [\[1\]](<../index.html#:~:text=[1]>):
-    ///     Theorem 1.
+    ///   Theorem 1.
     /// - `w = n * k`: As it is required to match the dimension of the gadget matrix,
-    ///     hence it has to  equal to `n * size of gadget_vec`
+    ///   hence it has to  equal to `n * size of gadget_vec`
     /// - `m_bar = n * k + log(n)^2`: is taken from [\[1\]](<../index.html#:~:text=[1]>)
-    ///     as a function satisfying `m_bar = n log q + ω(log n)`
+    ///   as a function satisfying `m_bar = n log q + ω(log n)`
     /// - the distribution is taken as [`PlusMinusOneZero`],
-    ///     see the example from [\[1\]](<../index.html#:~:text=[1]>): after statistical instantiation in section 3.2
+    ///   see the example from [\[1\]](<../index.html#:~:text=[1]>): after statistical instantiation in section 3.2
     ///
     /// Parameters:
     /// - `n`: the security parameter for the generation
@@ -115,7 +115,7 @@ impl GadgetParameters {
         // [`i64`] because downstream matrices can be at most that size
         let q = q.into();
         let n: Z = n.into();
-        assert!(n >= Z::ONE && n <= Z::from(i64::MAX));
+        assert!(n >= Z::ONE && n <= i64::MAX);
 
         let base = Z::from(2);
         let log_q = Z::from(&q).log_ceil(&base).unwrap();
@@ -140,10 +140,10 @@ impl GadgetParametersRing {
     ///
     /// - `base = 2` is taken from [\[3\]](<../index.html#:~:text=[3]>)
     /// - `k = log_2_ceil(q)` is taken from [\[3\]](<../index.html#:~:text=[3]>):
-    ///     Algorithm 1.
+    ///   Algorithm 1.
     /// - `m_bar = 2 + k`: is taken from [\[3\]](<../index.html#:~:text=[3]>)
     /// - the distribution is taken as [`SampleZ`],
-    ///     as in [\[3\]](<../index.html#:~:text=[3]>)
+    ///   as in [\[3\]](<../index.html#:~:text=[3]>)
     /// - the modulus is defined by `X^n +1 mod q` as in [\[3\]](<../index.html#:~:text=[3]>)
     ///
     /// Parameters:
@@ -167,7 +167,7 @@ impl GadgetParametersRing {
         // [`i64`] because downstream matrices can be at most that size
         let q = q.into();
         let n = n.into();
-        assert!(n >= Z::ONE && n <= Z::from(i64::MAX));
+        assert!(n >= Z::ONE && n <= i64::MAX);
 
         let base = Z::from(2);
         let log_q = Z::from(&q).log_ceil(&base).unwrap();

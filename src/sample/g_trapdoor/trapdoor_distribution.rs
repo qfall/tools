@@ -12,7 +12,7 @@
 use qfall_math::{
     integer::{MatPolyOverZ, MatZ, PolyOverZ, Z},
     rational::Q,
-    traits::SetEntry,
+    traits::MatrixSetEntry,
 };
 use serde::{Deserialize, Serialize};
 
@@ -127,7 +127,7 @@ mod test_pm_one_zero {
     use super::PlusMinusOneZero;
     use super::TrapdoorDistribution;
     use qfall_math::integer::Z;
-    use qfall_math::traits::GetEntry;
+    use qfall_math::traits::*;
 
     /// Ensure that the distribution samples in its correct range.
     #[test]
@@ -148,10 +148,7 @@ mod test_pm_one_zero {
 #[cfg(test)]
 mod test_sample_z {
     use super::{SampleZ, TrapdoorDistributionRing};
-    use qfall_math::{
-        rational::Q,
-        traits::{GetNumRows, Pow},
-    };
+    use qfall_math::{rational::Q, traits::*};
 
     /// Ensure that the distribution samples are in the correct range,
     #[test]
@@ -161,9 +158,7 @@ mod test_sample_z {
             let sample = SampleZ.sample(&10.into(), &15.into(), &s);
 
             // it should be the same as sampling a vector with 10*15 entries
-            let coeff_embedding = sample
-                .transpose()
-                .into_coefficient_embedding_from_matrix(10);
+            let coeff_embedding = sample.transpose().into_coefficient_embedding(10);
 
             // test for concentration bound
             assert!(

@@ -29,7 +29,7 @@ use serde::{Deserialize, Serialize};
 /// - `n`: specifies the security parameter, which is not equal to the bit-security level
 /// - `q`: specifies the modulus over which the encryption is computed
 /// - `alpha`: specifies the Gaussian parameter used for independent
-///     sampling from the discrete Gaussian distribution
+///   sampling from the discrete Gaussian distribution
 ///
 /// # Examples
 /// ```
@@ -71,7 +71,7 @@ impl RingLPR {
     ///   of the uniform at random instantiated matrix `A`
     /// - `q`: specifies the modulus
     /// - `alpha`: specifies the Gaussian parameter used for independent
-    ///     sampling from the discrete Gaussian distribution
+    ///   sampling from the discrete Gaussian distribution
     ///
     /// Returns a correct and secure [`RingLPR`] PK encryption instance or
     /// a [`MathError`] if the instance would not be correct or secure.
@@ -121,7 +121,7 @@ impl RingLPR {
     pub fn new_from_n(n: impl Into<Z>) -> Self {
         let n = n.into();
         assert!(
-            n >= Z::from(10),
+            n >= 10,
             "Choose n >= 10 as this function does not return parameters ensuring proper correctness of the scheme otherwise."
         );
 
@@ -221,10 +221,10 @@ impl RingLPR {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     correct RingLPR public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   correct RingLPR public key encryption instance.
     /// - Returns a [`MathError`] of type [`ConversionError`](MathError::ConversionError)
-    ///     if the value does not fit into an [`i64`].
+    ///   if the value does not fit into an [`i64`].
     pub fn check_correctness(&self) -> Result<(), MathError> {
         let n_i64 = i64::try_from(&self.n)?;
 
@@ -241,7 +241,7 @@ impl RingLPR {
             which is required for the correctness of this scheme.",
         );
         if let Some((root, _)) = result {
-            if root != Z::from(2) {
+            if root != 2 {
                 return Err(MathError::InvalidIntegerInput(err_msg));
             }
         } else {
@@ -289,8 +289,8 @@ impl RingLPR {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     secure RingLPR public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   secure RingLPR public key encryption instance.
     pub fn check_security(&self) -> Result<(), MathError> {
         let q = Z::from(&self.q.get_q());
 
@@ -356,7 +356,7 @@ impl PKEncryptionScheme for RingLPR {
     /// - s <- χ
     /// - e <- χ
     /// - b = s * a + e
-    ///     where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
+    ///   where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
     ///
     /// Then, `pk = (a, b)` and `sk = s` are returned.
     ///
@@ -401,7 +401,7 @@ impl PKEncryptionScheme for RingLPR {
     /// - u = a * r + e1
     /// - v = b * r + e2 + mu * q/2
     /// - c = (u, v)
-    ///     where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
+    ///   where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
     ///
     /// Then, cipher `c = (u, v)` as a polynomial of type [`PolynomialRingZq`] is returned.
     ///
@@ -422,7 +422,7 @@ impl PKEncryptionScheme for RingLPR {
     fn enc(&self, pk: &Self::PublicKey, message: impl Into<Z>) -> Self::Cipher {
         // ensure mu has at most n bits
         let message: Z = message.into().abs();
-        let mu = message.modulo(Z::from(2).pow(&self.n).unwrap());
+        let mu = message % Z::from(2).pow(&self.n).unwrap();
         // set mu_q_half to polynomial with n {0,1} coefficients
         let mu_q_half = self.z_into_polynomialringzq(&mu);
 

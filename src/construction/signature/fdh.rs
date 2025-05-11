@@ -35,7 +35,7 @@ pub mod serialize;
 ///
 /// Attributes
 /// - `psf`: The PSF which has to implement the [`PSF`] trait and must also be
-///     (de-)serializable.
+///   (de-)serializable.
 /// - `storage`: A Hashmap that safes all previously signed messages and their signature
 /// - `hash`: The hash-function which has to map a string into the correct domain
 ///

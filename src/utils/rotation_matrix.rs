@@ -10,10 +10,7 @@
 //! which find application in ring-based implementations for the special rings of the form
 //! `Z[X]/(X^n + 1)`.
 
-use qfall_math::{
-    integer::MatZ,
-    traits::{Concatenate, GetEntry, GetNumColumns, GetNumRows, SetEntry},
-};
+use qfall_math::{integer::MatZ, traits::*};
 
 /// Takes in a vector and computes and the rotation matrix as follows.
 /// For a vector `[[a_1],[a_2],...,[a_n]]` it computes the rotation matrix as

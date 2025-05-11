@@ -13,7 +13,7 @@ use super::{gadget_classical::find_solution_gadget_mat, gadget_parameters::Gadge
 use qfall_math::{
     integer::{MatZ, Z},
     integer_mod_q::MatZq,
-    traits::{Concatenate, GetNumColumns, GetNumRows, Pow, SetEntry, Tensor},
+    traits::*,
 };
 
 /// Generates a short basis according to [\[1\]](<../index.html#:~:text=[1]>).
@@ -71,7 +71,7 @@ fn gen_sa_l(r: &MatZ) -> MatZ {
 fn gen_sa_r(params: &GadgetParameters, tag: &MatZq, a: &MatZq) -> MatZ {
     let mut s = compute_s(params);
     // if `base^k = q`, then the reverse of `S` has a shorter diagonalization
-    if params.base.pow(&params.k).unwrap() == Z::from(&params.q) {
+    if params.base.pow(&params.k).unwrap() == params.q {
         s.reverse_columns();
     }
     let w = compute_w(params, tag, a);
@@ -92,7 +92,7 @@ fn compute_s(params: &GadgetParameters) -> MatZ {
     for i in 0..(sk.get_num_rows() - 1) {
         sk.set_entry(i + 1, i, Z::MINUS_ONE).unwrap();
     }
-    sk = if params.base.pow(&params.k).unwrap() == Z::from(&params.q) {
+    sk = if params.base.pow(&params.k).unwrap() == params.q {
         // compute s in the special case where the modulus is a power of base
         // i.e. the last column can remain as it is
         sk
@@ -101,7 +101,7 @@ fn compute_s(params: &GadgetParameters) -> MatZ {
         // represent modulus in `base` and set last row accordingly
         let mut q = Z::from(&params.q);
         for i in 0..(sk.get_num_rows()) {
-            let q_i = q.modulo(&params.base);
+            let q_i = &q % &params.base;
             sk.set_entry(i, sk.get_num_columns() - 1, &q_i).unwrap();
             q = (q - q_i).div_exact(&params.base).unwrap();
         }
@@ -129,7 +129,7 @@ mod test_gen_short_basis_for_trapdoor {
         integer::Z,
         integer_mod_q::{MatZq, Modulus},
         rational::{MatQ, Q},
-        traits::{GetNumColumns, GetNumRows, Pow, SetEntry},
+        traits::*,
     };
 
     /// Ensure that every vector within the returned basis is in `Λ^⟂(A)`.
@@ -460,7 +460,7 @@ mod test_compute_w {
     use qfall_math::{
         integer::{MatZ, Z},
         integer_mod_q::MatZq,
-        traits::GetNumColumns,
+        traits::MatrixDimensions,
     };
     use std::str::FromStr;
 

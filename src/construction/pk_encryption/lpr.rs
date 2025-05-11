@@ -15,7 +15,7 @@ use qfall_math::{
     integer::Z,
     integer_mod_q::{MatZq, Modulus, Zq},
     rational::Q,
-    traits::{Concatenate, Distance, GetEntry, Pow, SetEntry},
+    traits::{Concatenate, Distance, MatrixGetEntry, MatrixSetEntry, Pow},
 };
 use serde::{Deserialize, Serialize};
 
@@ -26,7 +26,7 @@ use serde::{Deserialize, Serialize};
 /// - `n`: specifies the security parameter, which is not equal to the bit-security level
 /// - `q`: specifies the modulus over which the encryption is computed
 /// - `alpha`: specifies the Gaussian parameter used for independent
-///     sampling from the discrete Gaussian distribution
+///   sampling from the discrete Gaussian distribution
 ///
 /// # Examples
 /// ```
@@ -68,7 +68,7 @@ impl LPR {
     ///   of the uniform at random instantiated matrix `A`
     /// - `q`: specifies the modulus
     /// - `alpha`: specifies the Gaussian parameter used for independent
-    ///     sampling from the discrete Gaussian distribution
+    ///   sampling from the discrete Gaussian distribution
     ///
     /// Returns a correct and secure [`LPR`] PK encryption instance or
     /// a [`MathError`] if the instance would not be correct or secure.
@@ -114,7 +114,7 @@ impl LPR {
     pub fn new_from_n(n: impl Into<Z>) -> Self {
         let n = n.into();
         assert!(
-            n >= Z::from(10),
+            n >= 10,
             "Choose n >= 10 as this function does not return parameters ensuring proper correctness of the scheme otherwise."
         );
 
@@ -214,10 +214,10 @@ impl LPR {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     correct LPR public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   correct LPR public key encryption instance.
     /// - Returns a [`MathError`] of type [`ConversionError`](MathError::ConversionError)
-    ///     if the value does not fit into an [`i64`]
+    ///   if the value does not fit into an [`i64`]
     pub fn check_correctness(&self) -> Result<(), MathError> {
         let n_i64 = i64::try_from(&self.n)?;
 
@@ -267,8 +267,8 @@ impl LPR {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     secure LPR public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   secure LPR public key encryption instance.
     pub fn check_security(&self) -> Result<(), MathError> {
         let q = Z::from(&self.q);
 
@@ -324,7 +324,7 @@ impl PKEncryptionScheme for LPR {
     /// - e <- χ^n
     /// - b^t = s^t * A + e^t
     /// - A = [A^t | b]^t
-    ///     where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
+    ///   where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
     ///
     /// Then, `pk = A` and `sk = s` are returned.
     ///
@@ -373,7 +373,7 @@ impl PKEncryptionScheme for LPR {
     /// - r <- χ^n
     /// - e <- χ^{n+1}
     /// - c = A * r + e + [0^{1 x n} | msg *  ⌊q/2⌋]^t
-    ///     where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
+    ///   where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
     ///
     /// Then, cipher `c` as a vector of type [`MatZq`] is returned.
     ///
@@ -393,7 +393,7 @@ impl PKEncryptionScheme for LPR {
     /// ```
     fn enc(&self, pk: &Self::PublicKey, message: impl Into<Z>) -> Self::Cipher {
         // generate message = message mod 2
-        let message: Z = message.into().modulo(2);
+        let message: Z = message.into() % 2;
 
         // x <- χ^n
         let vec_r = MatZq::sample_discrete_gauss(

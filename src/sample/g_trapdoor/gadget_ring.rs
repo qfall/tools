@@ -15,7 +15,9 @@ use qfall_math::{
     integer::{MatPolyOverZ, PolyOverZ, Z},
     integer_mod_q::{MatPolynomialRingZq, MatZq, PolynomialRingZq},
     rational::Q,
-    traits::{Concatenate, GetEntry, IntoCoefficientEmbedding, Pow, SetCoefficient, SetEntry},
+    traits::{
+        Concatenate, IntoCoefficientEmbedding, MatrixGetEntry, MatrixSetEntry, Pow, SetCoefficient,
+    },
 };
 use std::fmt::Display;
 
@@ -24,8 +26,8 @@ use std::fmt::Display;
 /// - Generates the gadget matrix: `G`
 /// - Samples the trapdoor `R` from the specified distribution in `params`
 /// - Outputs
-///     `([1 | a_bar | g_1 - (a_bar * r_1 + e_1) | ... | g_k - (a_bar * r_k + e_k) ], r, e)`
-///     as a tuple of `(A,R)`, where `R` defines a trapdoor for `A`.
+///   `([1 | a_bar | g_1 - (a_bar * r_1 + e_1) | ... | g_k - (a_bar * r_k + e_k) ], r, e)`
+///   as a tuple of `(A,R)`, where `R` defines a trapdoor for `A`.
 ///
 /// Parameters:
 /// - `params`: all gadget parameters which are required to generate the trapdoor
@@ -49,9 +51,9 @@ use std::fmt::Display;
 ///
 /// # Errors and Failures
 /// - Returns a [`MathError`] of type [`MismatchingMatrixDimension`](MathError::MismatchingMatrixDimension)
-///     if the matrices can not be concatenated due to mismatching dimensions.
+///   if the matrices can not be concatenated due to mismatching dimensions.
 /// - Returns a [`MathError`] of type [`OutOfBounds`](MathError::OutOfBounds)
-///     if row or column are greater than the matrix size.
+///   if row or column are greater than the matrix size.
 ///
 /// # Panics ...
 /// - if `params.k < 1` or it does not fit into an [`i64`].
@@ -175,7 +177,7 @@ mod test_gen_trapdoor_ring {
     use qfall_math::{
         integer::{MatPolyOverZ, PolyOverZ, Z},
         integer_mod_q::MatPolynomialRingZq,
-        traits::{Concatenate, GetCoefficient, GetEntry, GetNumColumns, GetNumRows, Pow},
+        traits::{Concatenate, GetCoefficient, MatrixDimensions, MatrixGetEntry, Pow},
     };
 
     /// Computes a trapdoor using the given secrets `(r,e)`
@@ -205,7 +207,7 @@ mod test_gen_trapdoor_ring {
         assert_eq!(params.k, Z::from(res.get_num_columns()));
         assert_eq!(1, res.get_num_rows());
 
-        for i in 0..(&params.k).try_into().unwrap() {
+        for i in 0..i64::try_from(&params.k).unwrap() {
             let res_entry: PolyOverZ = res.get_entry(0, i).unwrap();
             assert_eq!(res_entry.get_coeff(0).unwrap(), params.base.pow(i).unwrap())
         }

@@ -15,7 +15,7 @@ use qfall_math::{
     integer::{MatZ, Z},
     integer_mod_q::{MatZq, Modulus, Zq},
     rational::Q,
-    traits::{Concatenate, Distance, GetEntry, Pow, SetEntry},
+    traits::{Concatenate, Distance, MatrixGetEntry, MatrixSetEntry, Pow},
 };
 use serde::{Deserialize, Serialize};
 
@@ -27,7 +27,7 @@ use serde::{Deserialize, Serialize};
 /// - `m`: defines the dimension of the underlying lattice
 /// - `q`: specifies the modulus over which the encryption is computed
 /// - `alpha`:  specifies the Gaussian parameter used for independent
-///     sampling from the discrete Gaussian distribution
+///   sampling from the discrete Gaussian distribution
 ///
 /// # Examples
 /// ```
@@ -71,7 +71,7 @@ impl DualRegev {
     /// - `m`: specifies the number of columns of matrix `A`
     /// - `q`: specifies the modulus
     /// - `alpha`:  specifies the Gaussian parameter used for independent
-    ///     sampling from the discrete Gaussian distribution
+    ///   sampling from the discrete Gaussian distribution
     ///
     /// Returns [`DualRegev`] PK encryption instance.
     ///
@@ -121,7 +121,7 @@ impl DualRegev {
     /// - if `n` does not fit into an [`i64`].
     pub fn new_from_n(n: impl Into<Z>) -> Self {
         let n = n.into();
-        if n < Z::from(10) {
+        if n < 10 {
             panic!("Choose n >= 10 as this function does not return parameters ensuring proper correctness of the scheme otherwise.");
         }
 
@@ -223,8 +223,8 @@ impl DualRegev {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     correct Dual Regev public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   correct Dual Regev public key encryption instance.
     pub fn check_correctness(&self) -> Result<(), MathError> {
         let q = Z::from(&self.q);
 
@@ -242,7 +242,7 @@ impl DualRegev {
             )));
         }
         // concentration bound with r=5 -> r * sqrt(m) * α > q/4
-        if 20 * self.m.sqrt() * &self.alpha > Q::from(q) {
+        if 20 * self.m.sqrt() * &self.alpha > q {
             return Err(MathError::InvalidIntegerInput(String::from(
                 "Correctness is not guaranteed as 5 * sqrt(m) * α > q/4, but 5 * sqrt(m) * α <= q/4 is required."
             )));
@@ -271,8 +271,8 @@ impl DualRegev {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     secure Dual Regev public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   secure Dual Regev public key encryption instance.
     pub fn check_security(&self) -> Result<(), MathError> {
         let q = Z::from(&self.q);
 
@@ -364,7 +364,7 @@ impl PKEncryptionScheme for DualRegev {
     /// - s <- Z_q^n
     /// - e <- χ^(m+1)
     /// - c^t = s^t * A + e^t + [0^{1xn} | msg *  ⌊q/2⌋]
-    ///     where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
+    ///   where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
     ///
     /// Then, the ciphertext `c` is returned as a vector of type [`MatZq`].
     ///
@@ -384,7 +384,7 @@ impl PKEncryptionScheme for DualRegev {
     /// ```
     fn enc(&self, pk: &Self::PublicKey, message: impl Into<Z>) -> Self::Cipher {
         // generate message = message mod 2
-        let message: Z = message.into().modulo(2);
+        let message: Z = message.into() % 2;
 
         // s <- Z_q^n
         let vec_s_t = MatZq::sample_uniform(1, &self.n, &self.q);

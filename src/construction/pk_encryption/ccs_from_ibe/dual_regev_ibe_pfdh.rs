@@ -31,7 +31,7 @@ impl CCSfromIBE<DualRegevIBE, PFDH<MatZq, (MatZ, MatQ), MatZ, MatZq, PSFGPV, Has
     /// - `r`: specifies the Gaussian parameter used for the [`PSFGPV`] for the [`PFDH`]
     /// - `randomness_length`: specifies the number of bits added to the message before signing
     /// - `alpha`: specifies the Gaussian parameter used for encryption in
-    ///     [`DualRegev`](crate::construction::pk_encryption::DualRegev) in the [`DualRegevIBE`]
+    ///   [`DualRegev`](crate::construction::pk_encryption::DualRegev) in the [`DualRegevIBE`]
     ///
     /// Returns an explicit implementation of an IND-CCA-secure public key encryption scheme.
     ///
@@ -86,7 +86,7 @@ impl CCSfromIBE<DualRegevIBE, PFDH<MatZq, (MatZ, MatQ), MatZ, MatZq, PSFGPV, Has
     pub fn init_dr_pfdh_from_n(n: impl Into<Z>) -> Self {
         let n = n.into();
         assert!(
-            n > Z::from(3),
+            n > 3,
             "n needs to be chosen larger than 3 for this function to work properly."
         );
 

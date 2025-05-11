@@ -30,7 +30,7 @@ use serde::{Deserialize, Serialize};
 /// - `r`: specifies the Gaussian parameter used for SampleD,
 ///   i.e. used for encryption
 /// - `alpha`: specifies the Gaussian parameter used for independent
-///     sampling from the discrete Gaussian distribution
+///   sampling from the discrete Gaussian distribution
 ///
 /// # Examples
 /// ```
@@ -77,7 +77,7 @@ impl RegevWithDiscreteGaussianRegularity {
     /// - `r`: specifies the Gaussian parameter used for SampleD,
     ///   i.e. used for encryption
     /// - `alpha`: specifies the Gaussian parameter used for independent
-    ///     sampling from the discrete Gaussian distribution
+    ///   sampling from the discrete Gaussian distribution
     ///
     /// Returns a [`RegevWithDiscreteGaussianRegularity`] PK encryption instance.
     ///
@@ -236,8 +236,8 @@ impl RegevWithDiscreteGaussianRegularity {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     correct RegevWithDiscreteGaussianRegularity public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   correct RegevWithDiscreteGaussianRegularity public key encryption instance.
     pub fn check_correctness(&self) -> Result<(), MathError> {
         let q: Z = Z::from(&self.q);
 
@@ -249,7 +249,7 @@ impl RegevWithDiscreteGaussianRegularity {
 
         // Correctness requirements
         // q >= 5 * r * m
-        if Q::from(q) < 5 * &self.r * &self.m {
+        if q < 5 * &self.r * &self.m {
             return Err(MathError::InvalidIntegerInput(String::from(
                 "Correctness is not guaranteed as q < 5rm, but q >= 5rm is required.",
             )));
@@ -285,20 +285,20 @@ impl RegevWithDiscreteGaussianRegularity {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     secure RegevWithDiscreteGaussianRegularity public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   secure RegevWithDiscreteGaussianRegularity public key encryption instance.
     pub fn check_security(&self) -> Result<(), MathError> {
         let q: Z = Z::from(&self.q);
 
         // Security requirements
         // q * α >= n
-        if &q * &self.alpha < Q::from(&self.n) {
+        if &q * &self.alpha < self.n {
             return Err(MathError::InvalidIntegerInput(String::from(
                 "Security is not guaranteed as q * α < n, but q * α >= n is required.",
             )));
         }
         // m >= 2(n + 1) lg (q)
-        if Q::from(&self.m) < 2 * (&self.n + 1) * q.log(10).unwrap() {
+        if self.m < 2 * (&self.n + 1) * q.log(10).unwrap() {
             return Err(MathError::InvalidIntegerInput(String::from(
                 "Security is not guaranteed as m < 2(n + 1) lg (q), but m >= 2(n + 1) lg (q) is required.",
             )));
@@ -355,7 +355,7 @@ impl PKEncryptionScheme for RegevWithDiscreteGaussianRegularity {
     /// - A <- Z_q^{n x m}
     /// - x <- χ^m
     /// - p = A^t * s + x
-    ///     where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
+    ///   where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
     ///
     /// Then, `pk = (A, p)` and `sk = s` are returned.
     ///
@@ -412,7 +412,7 @@ impl PKEncryptionScheme for RegevWithDiscreteGaussianRegularity {
     /// ```
     fn enc(&self, pk: &Self::PublicKey, message: impl Into<Z>) -> Self::Cipher {
         // generate message = message mod 2
-        let message: Z = message.into().modulo(2);
+        let message: Z = message.into() % 2;
 
         // e <- SampleD over lattice Z^m, center 0 with Gaussian parameter r
         let vec_e = MatZq::sample_d_common(&self.m, &self.q, &self.n, &self.r).unwrap();

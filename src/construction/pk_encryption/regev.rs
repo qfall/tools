@@ -15,7 +15,7 @@ use qfall_math::{
     integer::{MatZ, Z},
     integer_mod_q::{MatZq, Modulus, Zq},
     rational::Q,
-    traits::{Concatenate, Distance, GetEntry, Pow, SetEntry},
+    traits::{Concatenate, Distance, MatrixGetEntry, MatrixSetEntry, Pow},
 };
 use serde::{Deserialize, Serialize};
 
@@ -27,7 +27,7 @@ use serde::{Deserialize, Serialize};
 /// - `m`: defines the dimension of the underlying lattice
 /// - `q`: specifies the modulus over which the encryption is computed
 /// - `alpha`:  specifies the Gaussian parameter used for independent
-///     sampling from the discrete Gaussian distribution
+///   sampling from the discrete Gaussian distribution
 ///
 /// # Examples
 /// ```
@@ -71,7 +71,7 @@ impl Regev {
     /// - `m`: specifies the number of columns of matrix `A`
     /// - `q`: specifies the modulus
     /// - `alpha`:  specifies the Gaussian parameter used for independent
-    ///     sampling from the discrete Gaussian distribution
+    ///   sampling from the discrete Gaussian distribution
     ///
     /// Returns a [`Regev`] PK encryption instance.
     ///
@@ -121,7 +121,7 @@ impl Regev {
     /// - if `n` does not fit into an [`i64`].
     pub fn new_from_n(n: impl Into<Z>) -> Self {
         let n = n.into();
-        if n < Z::from(10) {
+        if n < 10 {
             panic!("Choose n >= 10 as this function does not return parameters ensuring proper correctness of the scheme otherwise.");
         }
 
@@ -224,8 +224,8 @@ impl Regev {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     correct Regev public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   correct Regev public key encryption instance.
     pub fn check_correctness(&self) -> Result<(), MathError> {
         let q = Z::from(&self.q);
 
@@ -243,7 +243,7 @@ impl Regev {
             )));
         }
         // concentration bound with r=5 -> r * sqrt(m) * α > q/4
-        if 20 * self.m.sqrt() * &self.alpha > Q::from(q) {
+        if 20 * self.m.sqrt() * &self.alpha > q {
             return Err(MathError::InvalidIntegerInput(String::from(
                 "Correctness is not guaranteed as 5 * sqrt(m) * α > q/4, but 5 * sqrt(m) * α <= q/4 is required."
             )));
@@ -272,8 +272,8 @@ impl Regev {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if at least one parameter was not chosen appropriately for a
-    ///     secure Regev public key encryption instance.
+    ///   if at least one parameter was not chosen appropriately for a
+    ///   secure Regev public key encryption instance.
     pub fn check_security(&self) -> Result<(), MathError> {
         let q = Z::from(&self.q);
 
@@ -336,7 +336,7 @@ impl PKEncryptionScheme for Regev {
     /// - e^t <- χ^m
     /// - b^t = s^t * A + e^t
     /// - A = [A^t | b]^t
-    ///     where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
+    ///   where χ is discrete Gaussian distributed with center 0 and Gaussian parameter q * α.
     ///
     /// Then, `pk = A` and `sk = s` of type [`MatZq`] are returned.
     ///
@@ -395,7 +395,7 @@ impl PKEncryptionScheme for Regev {
     /// ```
     fn enc(&self, pk: &Self::PublicKey, message: impl Into<Z>) -> Self::Cipher {
         // generate message = message mod 2
-        let message: Z = message.into().modulo(2);
+        let message: Z = message.into() % 2;
 
         // x <- Z_2^m
         let vec_x = MatZ::sample_uniform(&self.m, 1, 0, 2).unwrap();

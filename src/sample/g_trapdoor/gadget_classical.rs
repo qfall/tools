@@ -14,7 +14,7 @@ use qfall_math::{
     error::MathError,
     integer::{MatZ, Z},
     integer_mod_q::{MatZq, Zq},
-    traits::{Concatenate, GetEntry, GetNumColumns, GetNumRows, Pow, SetEntry, Tensor},
+    traits::*,
 };
 use std::fmt::Display;
 
@@ -22,7 +22,7 @@ use std::fmt::Display;
 /// - Generates the gadget matrix: `G`
 /// - Samples the trapdoor `R` from the specified distribution in `params`
 /// - Outputs `([a_bar | tag * g - a_bar * r], r)` as a tuple of `(A,R)`,
-///     where `R` defines a trapdoor for `A`.
+///   where `R` defines a trapdoor for `A`.
 ///
 /// Parameters:
 /// - `params`: all gadget parameters which are required to generate the trapdoor
@@ -46,9 +46,9 @@ use std::fmt::Display;
 ///
 /// # Errors and Failures
 /// - Returns a [`MathError`] of type [`MismatchingMatrixDimension`](MathError::MismatchingMatrixDimension)
-///     if the matrices can not be concatenated due to mismatching dimensions.
+///   if the matrices can not be concatenated due to mismatching dimensions.
 /// - Returns a [`MathError`] of type [`MismatchingModulus`](MathError::MismatchingModulus)
-///     if the matrices can not be concatenated due to mismatching moduli.
+///   if the matrices can not be concatenated due to mismatching moduli.
 ///
 /// # Panics ...
 /// - if `params.k < 1` or it does not fit into an [`i64`].
@@ -136,12 +136,8 @@ pub fn gen_gadget_vec(k: impl TryInto<i64> + Display, base: &Z) -> MatZ {
 ///
 /// # Examples
 /// ```
-/// use qfall_math::integer::Z;
-/// use qfall_math::integer_mod_q::Zq;
-/// use qfall_math::integer::MatZ;
-/// use qfall_crypto::sample::g_trapdoor::gadget_classical::find_solution_gadget_vec;
-/// use qfall_crypto::sample::g_trapdoor::gadget_classical::gen_gadget_vec;
-/// use qfall_math::traits::GetEntry;
+/// use qfall_math::{integer::{Z, MatZ}, integer_mod_q::Zq, traits::MatrixGetEntry};
+/// use qfall_crypto::sample::g_trapdoor::gadget_classical::{find_solution_gadget_vec, gen_gadget_vec};
 /// use std::str::FromStr;
 ///
 /// let k = Z::from(5);
@@ -161,14 +157,14 @@ pub fn gen_gadget_vec(k: impl TryInto<i64> + Display, base: &Z) -> MatZ {
 /// # Panics ...
 /// - if the modulus of the value is greater than `base^k`.
 pub fn find_solution_gadget_vec(value: &Zq, k: &Z, base: &Z) -> MatZ {
-    if base.pow(k).unwrap() < Z::from(&value.get_mod()) {
+    if base.pow(k).unwrap() < value.get_mod() {
         panic!("The modulus is too large, the value is potentially not representable.");
     }
 
     let mut value = value.get_representative_least_nonnegative_residue();
     let mut out = MatZ::new(k, 1);
     for i in 0..out.get_num_rows() {
-        let val_i = value.modulo(base);
+        let val_i = &value % base;
         out.set_entry(i, 0, &val_i).unwrap();
         value = (value - val_i).div_exact(base).unwrap();
     }
@@ -291,7 +287,7 @@ mod test_gen_trapdoor {
     use qfall_math::{
         integer::{MatZ, Z},
         integer_mod_q::{MatZq, Modulus},
-        traits::{Concatenate, GetNumColumns, GetNumRows, SetEntry},
+        traits::*,
     };
 
     /// Assure that the trapdoor `r` returned from [`gen_trapdoor`] is actually a
@@ -377,7 +373,7 @@ mod test_find_solution_gadget {
     use qfall_math::{
         integer::Z,
         integer_mod_q::{MatZq, Zq},
-        traits::GetEntry,
+        traits::MatrixGetEntry,
     };
     use std::str::FromStr;
 

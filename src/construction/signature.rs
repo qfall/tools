@@ -11,9 +11,9 @@
 //! implementing the [`SignatureScheme`] trait.
 //!
 //! - \[1\] Gentry, Craig, Chris Peikert, and Vinod Vaikuntanathan.
-//!     "Trapdoors for hard lattices and new cryptographic constructions."
-//!     Proceedings of the fortieth annual ACM symposium on Theory of computing. 2008.
-//!     <https://doi.org/10.1145/1374376.1374407>
+//!   "Trapdoors for hard lattices and new cryptographic constructions."
+//!   Proceedings of the fortieth annual ACM symposium on Theory of computing. 2008.
+//!   <https://doi.org/10.1145/1374376.1374407>
 
 mod fdh;
 mod pfdh;

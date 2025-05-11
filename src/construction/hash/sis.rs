@@ -9,12 +9,7 @@
 //! This module contains an implementation of the collision-resistant
 //! SIS-based hash function.
 
-use qfall_math::{
-    error::MathError,
-    integer::Z,
-    integer_mod_q::MatZq,
-    traits::{GetNumColumns, GetNumRows},
-};
+use qfall_math::{error::MathError, integer::Z, integer_mod_q::MatZq, traits::MatrixDimensions};
 use serde::{Deserialize, Serialize};
 
 /// This struct keeps an instance of the [`SISHash`] including
@@ -71,7 +66,7 @@ impl SISHash {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if `n <= 0`.
+    ///   if `n <= 0`.
     pub fn gen(n: impl Into<Z>, m: impl Into<Z>, q: impl Into<Z>) -> Result<Self, MathError> {
         let n: Z = n.into();
         let m: Z = m.into();
@@ -105,8 +100,8 @@ impl SISHash {
     ///
     /// # Errors and Failures
     /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
-    ///     if `m < n log q`, or `q <= ⌈sqrt(n log q)⌉`
-    ///     as collision-resistance would otherwise not be ensured.
+    ///   if `m < n log q`, or `q <= ⌈sqrt(n log q)⌉`
+    ///   as collision-resistance would otherwise not be ensured.
     pub fn check_security(&self) -> Result<(), MathError> {
         let n: Z = self.key.get_num_rows().into();
         let m: Z = self.key.get_num_columns().into();
@@ -166,7 +161,7 @@ impl SISHash {
 #[cfg(test)]
 mod test_gen {
     use super::{SISHash, Z};
-    use qfall_math::traits::{GetNumColumns, GetNumRows};
+    use qfall_math::traits::MatrixDimensions;
 
     /// Checks whether too small chosen `n` results in an error.
     #[test]
@@ -228,7 +223,7 @@ mod test_gen {
 #[cfg(test)]
 mod test_hash {
     use super::{MatZq, SISHash, Z};
-    use qfall_math::traits::{GetNumColumns, GetNumRows};
+    use qfall_math::traits::MatrixDimensions;
 
     /// Ensures that non-column-vectors result in a panic.
     #[should_panic]
@@ -270,6 +265,6 @@ mod test_hash {
 
         assert_eq!(5, res.get_num_rows());
         assert_eq!(1, res.get_num_columns());
-        assert_eq!(Z::from(11), res.get_mod().into());
+        assert_eq!(Z::from(11), Z::from(res.get_mod()));
     }
 }

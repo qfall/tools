@@ -9,11 +9,12 @@
 //! This module contains sha256 hashes into different domains.
 
 use super::HashInto;
+use qfall_math::traits::FromCoefficientEmbedding;
 use qfall_math::utils::index::evaluate_indices;
 use qfall_math::{
     integer::{MatPolyOverZ, Z},
     integer_mod_q::{MatPolynomialRingZq, MatZq, Modulus, ModulusPolynomialRingZq, Zq},
-    traits::SetEntry,
+    traits::MatrixSetEntry,
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -252,7 +253,7 @@ impl HashInto<MatPolynomialRingZq> for HashMatPolynomialRingZq {
         let embedding =
             hash_to_mat_zq_sha256(m, self.rows * highest_deg, self.cols, self.modulus.get_q())
                 .get_representative_least_nonnegative_residue();
-        let poly_mat = MatPolyOverZ::from_coefficient_embedding_to_matrix(&embedding, highest_deg);
+        let poly_mat = MatPolyOverZ::from_coefficient_embedding((&embedding, highest_deg - 1));
         MatPolynomialRingZq::from((&poly_mat, &self.modulus))
     }
 }
@@ -347,10 +348,7 @@ mod tests_sha {
 mod hash_into_mat_polynomial_ring_zq {
     use super::{HashInto, HashMatPolynomialRingZq};
     use crate::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
-    use qfall_math::{
-        integer::PolyOverZ,
-        traits::{GetEntry, GetNumColumns, GetNumRows},
-    };
+    use qfall_math::{integer::PolyOverZ, traits::*};
 
     /// Ensure that the hash function maps into the correct dimension and it is also
     /// static, i.e. the same value is returned, when the same value  is hashed.

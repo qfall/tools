@@ -19,10 +19,13 @@ use crate::{
     utils::rotation_matrix::rot_minus_matrix,
 };
 use qfall_math::{
-    integer::{MatPolyOverZ, MatZ, PolyOverZ, Z},
+    integer::{MatPolyOverZ, MatZ, PolyOverZ},
     integer_mod_q::{MatPolynomialRingZq, MatZq},
     rational::{MatQ, PolyOverQ, Q},
-    traits::{FromCoefficientEmbedding, GetNumRows, Pow},
+    traits::{
+        FromCoefficientEmbedding, IntoCoefficientEmbedding, MatrixDimensions, MatrixGetSubmatrix,
+        Pow,
+    },
 };
 use serde::{Deserialize, Serialize};
 
@@ -112,7 +115,7 @@ impl PSF<MatPolynomialRingZq, (MatPolyOverZ, MatPolyOverZ), MatPolyOverZ, MatPol
     fn samp_d(&self) -> MatPolyOverZ {
         let dimension = self.gp.modulus.get_degree() * (&self.gp.k + 2);
         let sample = MatZ::sample_d_common(dimension, &self.gp.n, &self.s).unwrap();
-        MatPolyOverZ::from_coefficient_embedding_to_matrix(&sample, self.gp.modulus.get_degree())
+        MatPolyOverZ::from_coefficient_embedding((&sample, self.gp.modulus.get_degree() - 1))
     }
 
     /// Samples an `e` in the domain using SampleD with a short basis that is generated
@@ -165,10 +168,10 @@ impl PSF<MatPolynomialRingZq, (MatPolyOverZ, MatPolyOverZ), MatPolyOverZ, MatPol
         // solve `rot^-(ι(a)) ι(x) = ι(u)` to get solution
         let u_embedded = u
             .get_representative_least_nonnegative_residue()
-            .into_coefficient_embedding_from_matrix(self.gp.modulus.get_degree());
+            .into_coefficient_embedding(self.gp.modulus.get_degree());
         let a_embedded = a
             .get_representative_least_nonnegative_residue()
-            .into_coefficient_embedding_from_matrix(self.gp.modulus.get_degree());
+            .into_coefficient_embedding(self.gp.modulus.get_degree());
         let rot_a = rot_minus_matrix(&a_embedded);
 
         let u_embedded = MatZq::from((&u_embedded, &self.gp.modulus.get_q()));
@@ -195,7 +198,7 @@ impl PSF<MatPolynomialRingZq, (MatPolyOverZ, MatPolyOverZ), MatPolyOverZ, MatPol
             center_embedded.push(embedded_sub_mat);
         }
 
-        MatPolyOverZ::from_coefficient_embedding_to_matrix(&sol, self.gp.modulus.get_degree())
+        MatPolyOverZ::from_coefficient_embedding((&sol, self.gp.modulus.get_degree() - 1))
             + MatPolyOverZ::sample_d(
                 &short_basis,
                 self.gp.modulus.get_degree(),
@@ -269,11 +272,11 @@ impl PSF<MatPolynomialRingZq, (MatPolyOverZ, MatPolyOverZ), MatPolyOverZ, MatPol
     fn check_domain(&self, sigma: &MatPolyOverZ) -> bool {
         let m = &self.gp.k + 2;
         let nr_coeffs = self.gp.modulus.get_degree();
-        let sigma_embedded = sigma.into_coefficient_embedding_from_matrix(nr_coeffs);
+        let sigma_embedded = sigma.into_coefficient_embedding(nr_coeffs);
 
         sigma.is_column_vector()
-            && m == Z::from(sigma.get_num_rows())
-            && Q::from(&sigma_embedded.norm_eucl_sqrd().unwrap())
+            && m == sigma.get_num_rows()
+            && sigma_embedded.norm_eucl_sqrd().unwrap()
                 <= self.s.pow(2).unwrap() * sigma_embedded.get_num_rows()
     }
 }
@@ -286,7 +289,7 @@ mod test_gpv_psf {
     use qfall_math::integer::{MatPolyOverZ, PolyOverZ};
     use qfall_math::integer_mod_q::MatPolynomialRingZq;
     use qfall_math::rational::Q;
-    use qfall_math::traits::{GetNumColumns, GetNumRows, SetEntry};
+    use qfall_math::traits::*;
 
     fn compute_s(n: i64) -> Q {
         ((2 * 2 * Q::from(1.005_f64) * Q::from(n).sqrt() + 1) * 2) * 4
