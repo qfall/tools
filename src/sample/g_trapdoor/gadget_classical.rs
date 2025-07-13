@@ -209,12 +209,11 @@ pub fn find_solution_gadget_vec(value: &Zq, k: &Z, base: &Z) -> MatZ {
 pub fn find_solution_gadget_mat(value: &MatZq, k: &Z, base: &Z) -> MatZ {
     let mut out = MatZ::new(k * value.get_num_rows(), value.get_num_columns());
     for i in 0..value.get_num_columns() as usize {
-        let mut _out: MatZ = find_solution_gadget_vec(&value.get_entry(0, i).unwrap(), k, base);
-        for j in 1..value.get_num_rows() as usize {
+        for j in 0..value.get_num_rows() as usize {
             let sol_j = find_solution_gadget_vec(&value.get_entry(j, i).unwrap(), k, base);
-            _out = _out.concat_vertical(&sol_j).unwrap();
+            out.set_submatrix(k * j as u64, i, &sol_j, 0, 0, -1, 0)
+                .unwrap();
         }
-        out.set_column(i, &_out, 0).unwrap();
     }
     out
 }

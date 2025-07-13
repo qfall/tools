@@ -7,7 +7,7 @@ autobenches = false
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-qfall-math = { git = "https://github.com/qfall/math", rev="25163dce852c488af602cddda752ff4c74b0d2c9" }
+qfall-math = { git = "https://github.com/qfall/math", rev="cac834c705ed05ce96262ebca72ec0dbe36720d9" }
 sha2 = "0.10.6"
 serde = {version="1.0", features=["derive"]}
 serde_json = "1.0"

@@ -157,7 +157,7 @@ fn compute_s(params: &GadgetParametersRing) -> MatPolyOverZ {
             let q_i = Zq::from((&q, &params.base)).get_representative_least_nonnegative_residue();
             sk.set_entry(i, sk.get_num_columns() - 1, PolyOverZ::from(&q_i))
                 .unwrap();
-            q = q - q_i;
+            q -= q_i;
             q = q.div_exact(&params.base).unwrap();
         }
         sk

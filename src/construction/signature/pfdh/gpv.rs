@@ -102,7 +102,7 @@ mod test_pfdh {
         let (pk, sk) = pfdh.gen();
 
         for i in 0..10 {
-            let m = format!("Hello World! {}", i);
+            let m = format!("Hello World! {i}");
 
             let sigma = pfdh.sign(m.to_owned(), &sk, &pk);
 

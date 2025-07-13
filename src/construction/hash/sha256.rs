@@ -39,7 +39,7 @@ pub fn sha256(string: &str) -> String {
     let mut hasher = Sha256::new();
     hasher.update(string);
     let result = hasher.finalize();
-    format!("{:x}", result)
+    format!("{result:x}")
 }
 
 /// Hashes a given String literal into a [`Zq`] using sha256.
@@ -309,7 +309,7 @@ mod tests_sha {
             if hash_to_zq_sha256(&(i.to_string() + str1), Z::from(271).pow(100).unwrap())
                 .get_representative_least_nonnegative_residue()
                 .distance(Z::ZERO)
-                > Z::from(u64::MAX)
+                > u64::MAX
             {
                 large = true;
             }

@@ -99,7 +99,7 @@ mod test_fdh {
         let (pk, sk) = fdh.gen();
 
         for i in 0..10 {
-            let m = format!("Hello World! {}", i);
+            let m = format!("Hello World! {i}");
 
             let sigma = fdh.sign(m.to_owned(), &sk, &pk);
 

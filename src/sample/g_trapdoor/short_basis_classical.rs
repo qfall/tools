@@ -61,10 +61,16 @@ pub fn gen_short_basis_for_trapdoor(
 
 /// Computes [ I | R, 0 | I ]
 fn gen_sa_l(r: &MatZ) -> MatZ {
-    let left = MatZ::identity(r.get_num_rows() + r.get_num_columns(), r.get_num_rows());
-    let identity_right_lower = MatZ::identity(r.get_num_columns(), r.get_num_columns());
-    let right = r.concat_vertical(&identity_right_lower).unwrap();
-    left.concat_horizontal(&right).unwrap()
+    let r_rows = r.get_num_rows();
+    let r_cols = r.get_num_columns();
+    let mut sa_l = MatZ::new(r_rows + r_cols, r_rows + r_cols);
+
+    for diagonal in 0..(r_rows + r_cols) {
+        unsafe { sa_l.set_entry_unchecked(diagonal, diagonal, 1) };
+    }
+    sa_l.set_submatrix(0, r_rows, r, 0, 0, -1, -1).unwrap();
+
+    sa_l
 }
 
 /// Computes `[ 0 | I, S' | W ]`
@@ -76,13 +82,23 @@ fn gen_sa_r(params: &GadgetParameters, tag: &MatZq, a: &MatZq) -> MatZ {
     }
     let w = compute_w(params, tag, a);
 
-    let zero = MatZ::new(w.get_num_columns(), s.get_num_columns());
-    let identity_upper = zero
-        .concat_horizontal(&MatZ::identity(w.get_num_columns(), w.get_num_columns()))
+    let mut sa_r = MatZ::new(
+        s.get_num_rows() + w.get_num_columns(),
+        s.get_num_columns() + w.get_num_columns(),
+    );
+
+    let offset_identity = s.get_num_columns();
+    for diagonal in 0..w.get_num_columns() {
+        unsafe { sa_r.set_entry_unchecked(diagonal, diagonal + offset_identity, 1) };
+    }
+
+    let offset_lower = w.get_num_columns();
+    sa_r.set_submatrix(offset_lower, 0, &s, 0, 0, -1, -1)
+        .unwrap();
+    sa_r.set_submatrix(offset_lower, s.get_num_columns(), &w, 0, 0, -1, -1)
         .unwrap();
 
-    let sw = s.concat_horizontal(&w).unwrap();
-    identity_upper.concat_vertical(&sw).unwrap()
+    sa_r
 }
 
 /// Compute S for `[ 0 | I, S' | W ]`

@@ -16,7 +16,8 @@ use qfall_math::{
     integer_mod_q::{MatPolynomialRingZq, MatZq, PolynomialRingZq},
     rational::Q,
     traits::{
-        Concatenate, IntoCoefficientEmbedding, MatrixGetEntry, MatrixSetEntry, Pow, SetCoefficient,
+        Concatenate, IntoCoefficientEmbedding, MatrixDimensions, MatrixGetEntry, MatrixSetEntry,
+        Pow, SetCoefficient,
     },
 };
 use std::fmt::Display;
@@ -101,12 +102,8 @@ pub fn gen_trapdoor_ring_lwe(
 /// - if `k < 1` or it does not fit into an [`i64`].
 pub fn gen_gadget_ring(k: impl TryInto<i64> + Display, base: &Z) -> MatPolyOverZ {
     let mut out = MatPolyOverZ::new(k, 1);
-    let mut i: i64 = 0;
-    while out
-        .set_entry(i, 0, &PolyOverZ::from(base.pow(i).unwrap()))
-        .is_ok()
-    {
-        i += 1;
+    for j in 0..out.get_num_rows() {
+        unsafe { out.set_entry_unchecked(j, 0, &PolyOverZ::from(base.pow(j).unwrap())) };
     }
     out
 }
