@@ -7,11 +7,11 @@
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
 use criterion::{criterion_group, Criterion};
-use qfall_crypto::construction::signature::{SignatureScheme, PFDH};
+use qfall_crypto::construction::signature::{SignatureScheme, PFDHGPV};
 
 /// Performs a full instantiation with an additional signing and verifying of a signature.
 fn pfdh_cycle(n: i64) {
-    let mut pfdh = PFDH::init_gpv(n, 113, 17, 128);
+    let mut pfdh = PFDHGPV::setup(n, 113, 17, 128);
 
     let m = "Hello World!";
 
@@ -46,7 +46,7 @@ fn bench_pfdh_full_cycle(c: &mut Criterion) {
 /// benchmark name. The `\ ` is used to escape the space, alternatively,
 /// quotation marks can be used.
 fn bench_pfdh_signature(c: &mut Criterion) {
-    let mut pfdh = PFDH::init_gpv(8, 113, 17, 128);
+    let mut pfdh = PFDHGPV::setup(8, 113, 17, 128);
 
     let m = "Hello World!";
 

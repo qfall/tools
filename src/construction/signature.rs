@@ -18,8 +18,8 @@
 mod fdh;
 mod pfdh;
 
-pub use fdh::FDH;
-pub use pfdh::PFDH;
+pub use fdh::{FDHGPVRing, FDHGPV};
+pub use pfdh::PFDHGPV;
 
 /// This trait should be implemented by every signature scheme.
 /// It captures the essential functionalities each signature scheme has to support.

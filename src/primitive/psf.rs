@@ -31,16 +31,21 @@ pub use gpv_ring::PSFGPVRing;
 /// actual implementations of a preimage sampleable function.
 /// A formal definition for these PSFs can be found in
 /// [\[1\]](<index.html#:~:text=[1]>)
-pub trait PSF<A, Trapdoor, Domain, Range> {
+pub trait PSF {
+    type A;
+    type Trapdoor;
+    type Domain;
+    type Range;
+
     /// Samples a parity-check matrix and a trapdoor for that matrix.
     ///
     /// Returns the parity-check matrix and the trapdoor.
-    fn trap_gen(&self) -> (A, Trapdoor);
+    fn trap_gen(&self) -> (Self::A, Self::Trapdoor);
 
     /// Samples an element in the domain according to a specified distribution.
     ///
     /// Returns the sampled element.
-    fn samp_d(&self) -> Domain;
+    fn samp_d(&self) -> Self::Domain;
 
     /// Samples an element `e` in the domain according to a specified distribution
     /// conditioned on `f_a(a, e) = u`.
@@ -52,7 +57,7 @@ pub trait PSF<A, Trapdoor, Domain, Range> {
     ///
     /// Returns a sample `e` from the domain on the conditioned discrete
     /// Gaussian distribution `f_a(a,e) = u`.
-    fn samp_p(&self, a: &A, r: &Trapdoor, u: &Range) -> Domain;
+    fn samp_p(&self, a: &Self::A, r: &Self::Trapdoor, u: &Self::Range) -> Self::Domain;
 
     /// Implements the efficiently computable function `f_a`,
     /// which is uniquely classified by `a`.
@@ -62,10 +67,10 @@ pub trait PSF<A, Trapdoor, Domain, Range> {
     /// - `sigma`: A column vector of length `m`
     ///
     /// Returns the result of `f_a`.
-    fn f_a(&self, a: &A, sigma: &Domain) -> Range;
+    fn f_a(&self, a: &Self::A, sigma: &Self::Domain) -> Self::Range;
 
     /// Checks whether an element is in the correct domain (and not just the correct type).
     ///
     /// Returns the result of the check as a boolean.
-    fn check_domain(&self, sigma: &Domain) -> bool;
+    fn check_domain(&self, sigma: &Self::Domain) -> bool;
 }

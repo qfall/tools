@@ -6,12 +6,15 @@
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
-//! A classical implementation of the [`FDH`] scheme using the [`PSFGPV`]
+//! A classical implementation of the FDH signature scheme using the [`PSFGPV`]
 //! according to [\[1\]](<../index.html#:~:text=[1]>).
 
-use super::FDH;
 use crate::{
-    construction::hash::sha256::HashMatZq, primitive::psf::PSFGPV,
+    construction::{
+        hash::{sha256::HashMatZq, HashInto},
+        signature::SignatureScheme,
+    },
+    primitive::psf::{PSF, PSFGPV},
     sample::g_trapdoor::gadget_parameters::GadgetParameters,
 };
 use qfall_math::{
@@ -19,71 +22,108 @@ use qfall_math::{
     integer_mod_q::{MatZq, Modulus},
     rational::{MatQ, Q},
 };
-use std::{collections::HashMap, marker::PhantomData};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
-impl FDH<MatZq, (MatZ, MatQ), MatZ, MatZq, PSFGPV, HashMatZq> {
-    /// Initializes an FDH signature scheme from a [`PSFGPV`].
-    ///
-    /// This function corresponds to an implementation of an FDH-signature
-    /// scheme with the explicit PSF [`PSFGPV`] which is generated using
-    /// the default of [`GadgetParameters`].
-    ///
-    /// Parameters:
-    /// - `n`: The security parameter
-    /// - `q`: The modulus used for the G-Trapdoors
-    /// - `s`: The Gaussian parameter with which is sampled
-    ///
-    /// Returns an explicit implementation of a FDH-signature scheme.
-    ///
-    /// # Example
-    /// ```
-    /// use qfall_crypto::construction::signature::{FDH, SignatureScheme};
-    ///
-    /// let m = "Hello World!";
-    ///
-    /// let mut fdh = FDH::init_gpv(4, 113, 17);
-    /// let (pk, sk) = fdh.gen();
-    ///
-    /// let sigma = fdh.sign(m.to_string(), &sk, &pk);
-    ///
-    /// assert!(fdh.vfy(m.to_string(), &sigma, &pk));
-    /// ```
-    ///
-    /// # Panics ...
-    /// - if `q <= 1`.
-    pub fn init_gpv(n: impl Into<Z>, q: impl Into<Modulus>, s: impl Into<Q>) -> Self {
-        let n = n.into();
-        let n_i64 = i64::try_from(&n).unwrap();
-        let q = q.into();
+/// Initializes an FDH signature scheme from a [`PSFGPV`].
+///
+/// This function corresponds to an implementation of an FDH-signature
+/// scheme with the explicit PSF [`PSFGPV`] which is generated using
+/// the default of [`GadgetParameters`].
+///
+/// Parameters:
+/// - `n`: The security parameter
+/// - `q`: The modulus used for the G-Trapdoors
+/// - `s`: The Gaussian parameter with which is sampled
+///
+/// Returns an explicit implementation of a FDH-signature scheme.
+///
+/// # Example
+/// ```
+/// use qfall_crypto::construction::signature::{FDHGPV, SignatureScheme};
+///
+/// let m = "Hello World!";
+///
+/// let mut fdh = FDHGPV::setup(4, 113, 17);
+/// let (pk, sk) = fdh.gen();
+///
+/// let sigma = fdh.sign(m.to_string(), &sk, &pk);
+///
+/// assert!(fdh.vfy(m.to_string(), &sigma, &pk));
+/// ```
+///
+/// # Panics ...
+/// - if `q <= 1`.
+#[derive(Serialize, Deserialize)]
+pub struct FDHGPV {
+    pub psf: PSFGPV,
+    pub storage: HashMap<String, MatZ>,
+    pub hash: HashMatZq,
+}
+
+impl FDHGPV {
+    pub fn setup(n: impl Into<Z>, q: impl Into<Modulus>, s: impl Into<Q>) -> Self {
+        let (n, q, s) = (n.into(), q.into(), s.into());
         let psf = PSFGPV {
             gp: GadgetParameters::init_default(&n, &q),
-            s: s.into(),
+            s,
         };
         Self {
-            psf: Box::new(psf),
+            psf,
             storage: HashMap::new(),
-            hash: Box::new(HashMatZq {
+            hash: HashMatZq {
                 modulus: q,
-                rows: n_i64,
+                rows: i64::try_from(n).unwrap(),
                 cols: 1,
-            }),
-            _a_type: PhantomData,
-            _trapdoor_type: PhantomData,
-            _range_type: PhantomData,
+            },
         }
+    }
+}
+
+impl SignatureScheme for FDHGPV {
+    type SecretKey = (MatZ, MatQ);
+    type PublicKey = MatZq;
+    type Signature = MatZ;
+
+    /// Generates a trapdoor by calling the `trap_gen` of the psf
+    fn gen(&mut self) -> (Self::PublicKey, Self::SecretKey) {
+        self.psf.trap_gen()
+    }
+    /// Firstly checks if the message has been signed before, and if, return that
+    /// signature, else it continues.
+    /// It hashes the message into the domain and then computes a signature using
+    /// `samp_p` from the psf with the trapdoor.
+    fn sign(&mut self, m: String, sk: &Self::SecretKey, pk: &Self::PublicKey) -> Self::Signature {
+        // check if it is in the HashMap
+        if let Some(sigma) = self.storage.get(&m) {
+            return sigma.clone();
+        }
+
+        let u = (self.hash).hash(&m);
+        let signature = self.psf.samp_p(pk, sk, &u);
+
+        // insert signature in HashMap
+        self.storage.insert(m, signature.clone());
+        signature
+    }
+
+    /// Checks if a signature is firstly within D_n, and then checks if
+    /// the signature is actually a valid preimage under `fa` of `hash(m)`.
+    fn vfy(&self, m: String, sigma: &Self::Signature, pk: &Self::PublicKey) -> bool {
+        if !self.psf.check_domain(sigma) {
+            return false;
+        }
+
+        let u = (self.hash).hash(&m);
+
+        self.psf.f_a(pk, sigma) == u
     }
 }
 
 #[cfg(test)]
 mod test_fdh {
-    use super::{HashMatZq, FDH, PSFGPV};
-    use crate::construction::signature::SignatureScheme;
-    use qfall_math::{
-        integer::{MatZ, Z},
-        integer_mod_q::MatZq,
-        rational::{MatQ, Q},
-        traits::Pow,
-    };
+    use crate::construction::signature::{fdh::gpv::FDHGPV, SignatureScheme};
+    use qfall_math::{integer::Z, rational::Q, traits::Pow};
 
     /// Ensure that the generated signature is valid.
     #[test]
@@ -95,7 +135,7 @@ mod test_fdh {
         let s: Q = ((&n * &k).sqrt() + 1) * Q::from(2) * (Z::from(2) * &n * &k).log(2).unwrap();
         let q = Z::from(2).pow(&k).unwrap();
 
-        let mut fdh = FDH::init_gpv(n, &q, &s);
+        let mut fdh = FDHGPV::setup(n, &q, &s);
         let (pk, sk) = fdh.gen();
 
         for i in 0..10 {
@@ -111,7 +151,7 @@ mod test_fdh {
     /// Ensure that an entry is actually added to the local storage.
     #[test]
     fn storage_filled() {
-        let mut fdh = FDH::init_gpv(5, 1024, 10);
+        let mut fdh = FDHGPV::setup(5, 1024, 10);
 
         let m = "Hello World!";
         let (pk, sk) = fdh.gen();
@@ -123,7 +163,7 @@ mod test_fdh {
     /// Ensure that after deserialization the HashMap still contains all entries.
     #[test]
     fn reload_hashmap() {
-        let mut fdh = FDH::init_gpv(5, 1024, 10);
+        let mut fdh = FDHGPV::setup(5, 1024, 10);
 
         // fill one entry in the HashMap
         let m = "Hello World!";
@@ -131,8 +171,7 @@ mod test_fdh {
         let _ = fdh.sign(m.to_owned(), &sk, &pk);
 
         let fdh_string = serde_json::to_string(&fdh).expect("Unable to create a json object");
-        let fdh_2: FDH<MatZq, (MatZ, MatQ), MatZ, MatZq, PSFGPV, HashMatZq> =
-            serde_json::from_str(&fdh_string).unwrap();
+        let fdh_2: FDHGPV = serde_json::from_str(&fdh_string).unwrap();
 
         assert_eq!(fdh.storage, fdh_2.storage);
     }

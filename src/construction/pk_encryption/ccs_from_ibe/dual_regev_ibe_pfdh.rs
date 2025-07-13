@@ -10,19 +10,10 @@
 //! the [`DualRegevIBE`] and [`PFDH`].
 
 use super::CCSfromIBE;
-use crate::{
-    construction::{
-        hash::sha256::HashMatZq, identity_based_encryption::DualRegevIBE, signature::PFDH,
-    },
-    primitive::psf::PSFGPV,
-};
-use qfall_math::{
-    integer::{MatZ, Z},
-    integer_mod_q::{MatZq, Modulus},
-    rational::{MatQ, Q},
-};
+use crate::construction::{identity_based_encryption::DualRegevIBE, signature::PFDHGPV};
+use qfall_math::{integer::Z, integer_mod_q::Modulus, rational::Q};
 
-impl CCSfromIBE<DualRegevIBE, PFDH<MatZq, (MatZ, MatQ), MatZ, MatZq, PSFGPV, HashMatZq>> {
+impl CCSfromIBE<DualRegevIBE, PFDHGPV> {
     /// Initializes a [`CCSfromIBE`] PK encryption scheme from a [`DualRegevIBE`] and a [`PFDH`] signature.
     ///
     /// Parameters:
@@ -57,7 +48,7 @@ impl CCSfromIBE<DualRegevIBE, PFDH<MatZq, (MatZ, MatQ), MatZ, MatZq, PSFGPV, Has
         let r = r.into();
 
         let dr_ibe = DualRegevIBE::new(&n, &q, &r, alpha);
-        let pfdh = PFDH::init_gpv(n, q, r, randomness_length);
+        let pfdh = PFDHGPV::setup(n, q, r, randomness_length);
 
         Self {
             ibe: dr_ibe,
@@ -91,7 +82,7 @@ impl CCSfromIBE<DualRegevIBE, PFDH<MatZq, (MatZ, MatQ), MatZ, MatZq, PSFGPV, Has
         );
 
         let ibe = DualRegevIBE::new_from_n(&n);
-        let pfdh = PFDH::init_gpv(&n, &ibe.dual_regev.q, &ibe.psf.s, &n);
+        let pfdh = PFDHGPV::setup(&n, &ibe.dual_regev.q, &ibe.psf.s, &n);
 
         Self {
             ibe,
