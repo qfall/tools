@@ -10,7 +10,7 @@
 //! the [`DualRegevIBE`] and [`PFDH`].
 
 use super::CCSfromIBE;
-use crate::construction::{identity_based_encryption::DualRegevIBE, signature::PFDHGPV};
+use crate::construction::{identity_based_encryption::DualRegevIBE, signature::pfdh::PFDHGPV};
 use qfall_math::{integer::Z, integer_mod_q::Modulus, rational::Q};
 
 impl CCSfromIBE<DualRegevIBE, PFDHGPV> {
@@ -25,7 +25,8 @@ impl CCSfromIBE<DualRegevIBE, PFDHGPV> {
     /// - `alpha`: specifies the Gaussian parameter used for encryption in
     ///   [`DualRegev`](crate::construction::pk_encryption::DualRegev) in the [`DualRegevIBE`]
     ///
-    /// Returns an explicit implementation of an IND-CCA-secure public key encryption scheme.
+    /// Returns an explicit implementation of an IND-CCA-secure public key
+    /// encryption scheme.
     ///
     /// # Example
     /// ```
@@ -63,8 +64,8 @@ impl CCSfromIBE<DualRegevIBE, PFDHGPV> {
     /// Parameters:
     /// - `n`: specifies the security parameter
     ///
-    /// Returns an explicit implementation of an IND-CCA-secure public key encryption scheme
-    /// chosen with appropriate parameters for given `n`..
+    /// Returns an explicit implementation of an IND-CCA-secure public key
+    /// encryption scheme chosen with appropriate parameters for given `n`..
     ///
     /// # Example
     /// ```

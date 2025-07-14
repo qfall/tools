@@ -7,7 +7,7 @@
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
 use criterion::{criterion_group, Criterion};
-use qfall_crypto::construction::signature::{SignatureScheme, PFDHGPV};
+use qfall_crypto::construction::signature::{pfdh::PFDHGPV, SignatureScheme};
 
 /// Performs a full instantiation with an additional signing and verifying of a signature.
 fn pfdh_cycle(n: i64) {

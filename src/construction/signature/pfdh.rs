@@ -16,8 +16,8 @@
 //! using a storage, so it is stateless.
 //!
 //! Requirements
-//! - `psf`: The PSF which has to implement the [`PSF`] trait and must also be
-//!   (de-)serializable.
+//! - `psf`: The PSF which has to implement the [`PSF`](crate::primitive::psf::PSF) trait
+//!   and must also be (de-)serializable.
 //! - `hash`: The hash-function which has to map a string into the correct domain.
 //! - `randomness_length`: The length of the salt that is added to the string before
 //!   hashing.
@@ -25,7 +25,7 @@
 //! # Example
 //! ## Signature Scheme from [`PSFGPV`](crate::primitive::psf::PSFGPV)
 //! ```
-//! use qfall_crypto::construction::signature::{PFDHGPV, SignatureScheme};
+//! use qfall_crypto::construction::signature::{pfdh::PFDHGPV, SignatureScheme};
 //!
 //! let mut pfdh = PFDHGPV::setup(4, 113, 17, 128);
 //!
@@ -37,6 +37,6 @@
 //! assert!(pfdh.vfy(m.to_owned(), &sigma, &pk));
 //! ```
 
-pub mod gpv;
+mod gpv;
 
 pub use gpv::PFDHGPV;

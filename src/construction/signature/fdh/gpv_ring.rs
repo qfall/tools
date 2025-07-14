@@ -34,17 +34,33 @@ use std::collections::HashMap;
 /// scheme with the explicit PSF [`PSFGPVRing`] which is generated using
 /// the default of [`GadgetParametersRing`].
 ///
-/// Parameters:
-/// - `n`: The security parameter
-/// - `q`: The modulus used for the G-Trapdoors
-/// - `s`: The Gaussian parameter with which is sampled
+/// Attributes:
+/// - `psf`: Defines the PSF needed for preimage sampling.
+/// - `storage`: Stores all previously constructed signatures.
+/// - `hash`: Defines the hash function going from Strings to the PSFs range.
 ///
 /// Returns an explicit implementation of an FDH-signature scheme.
 ///
-/// # TODO: Example
+/// # Example
+/// ```
+/// use qfall_crypto::construction::signature::fdh::FDHGPVRing;
+/// use crate::qfall_crypto::construction::signature::SignatureScheme;
+/// use qfall_math::rational::Q;
 ///
-/// # Panics ...
-/// - if `q <= 1`.
+/// const MODULUS: i64 = 512;
+/// const N: i64 = 8;
+/// fn compute_s() -> Q {
+///     ((2 * 2 * Q::from(1.005_f64) * Q::from(N).sqrt() + 1) * 2) * 4
+/// }
+///
+/// let mut fdh = FDHGPVRing::setup(N, MODULUS, compute_s());
+/// let (pk, sk) = fdh.gen();
+/// let m = &format!("Hello World!");
+/// let sigma = fdh.sign(m.to_owned(), &sk, &pk);
+/// assert!(
+///     fdh.vfy(m.to_owned(), &sigma, &pk),
+/// );
+/// ```
 #[derive(Serialize, Deserialize)]
 pub struct FDHGPVRing {
     pub psf: PSFGPVRing,
@@ -53,6 +69,38 @@ pub struct FDHGPVRing {
 }
 
 impl FDHGPVRing {
+    /// Initializes the [`FDHGPVRing`] with default parameters.
+    /// The setup function takes in the security parameter, the modulus, a length bound
+    /// for the signatures, and the length of randomness for this construction.
+    /// Then, the [`PSFGPVRing`] is instantiated with the default [`GadgetParametersRing`].
+    /// This PSF with an additional storage and hash function are secured in the struct.
+    ///
+    /// Parameters:
+    /// - `n`: The security parameter
+    /// - `q`: The modulus used for the G-Trapdoors
+    /// - `s`: The Gaussian parameter with which is sampled
+    ///
+    /// Returns an explicit instantiation of a FDH signature scheme using the default
+    /// parameters.
+    ///
+    /// # Example
+    /// ```
+    /// use qfall_crypto::construction::signature::fdh::FDHGPVRing;
+    /// use crate::qfall_crypto::construction::signature::SignatureScheme;
+    /// use qfall_math::rational::Q;
+    ///
+    /// const MODULUS: i64 = 512;
+    /// const N: i64 = 8;
+    /// fn compute_s() -> Q {
+    ///     ((2 * 2 * Q::from(1.005_f64) * Q::from(N).sqrt() + 1) * 2) * 4
+    /// }
+    ///
+    /// let mut fdh = FDHGPVRing::setup(N, MODULUS, compute_s());
+    /// ```
+    ///
+    /// # Panics ...
+    /// - if the security parameter n is not in [1, i64::MAX].    
+    /// - if `q <= 1`.
     pub fn setup(n: impl Into<Z>, q: impl Into<Modulus>, s: impl Into<Q>) -> Self {
         let (n, q, s) = (n.into(), q.into(), s.into());
         let psf = PSFGPVRing {
@@ -74,8 +122,11 @@ impl FDHGPVRing {
 }
 
 impl SignatureScheme for FDHGPVRing {
+    /// The trapdoor and a precomputed short basis that speeds up preimage sampling.
     type SecretKey = (MatPolyOverZ, MatPolyOverZ);
+    /// The public matrix defining the PSF, for which the secret key defines a trapdoor
     type PublicKey = MatPolynomialRingZq;
+    /// Defined by the domain of the PSF.
     type Signature = MatPolyOverZ;
 
     /// Generates a trapdoor by calling the `trap_gen` of the psf

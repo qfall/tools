@@ -31,16 +31,16 @@ use std::collections::HashMap;
 /// scheme with the explicit PSF [`PSFGPV`] which is generated using
 /// the default of [`GadgetParameters`].
 ///
-/// Parameters:
-/// - `n`: The security parameter
-/// - `q`: The modulus used for the G-Trapdoors
-/// - `s`: The Gaussian parameter with which is sampled
+/// Attributes:
+/// - `psf`: Defines the PSF needed for preimage sampling.
+/// - `storage`: Stores all previously constructed signatures.
+/// - `hash`: Defines the hash function going from Strings to the PSFs range.
 ///
 /// Returns an explicit implementation of a FDH-signature scheme.
 ///
 /// # Example
 /// ```
-/// use qfall_crypto::construction::signature::{FDHGPV, SignatureScheme};
+/// use qfall_crypto::construction::signature::{fdh::FDHGPV, SignatureScheme};
 ///
 /// let m = "Hello World!";
 ///
@@ -51,9 +51,6 @@ use std::collections::HashMap;
 ///
 /// assert!(fdh.vfy(m.to_string(), &sigma, &pk));
 /// ```
-///
-/// # Panics ...
-/// - if `q <= 1`.
 #[derive(Serialize, Deserialize)]
 pub struct FDHGPV {
     pub psf: PSFGPV,
@@ -62,6 +59,30 @@ pub struct FDHGPV {
 }
 
 impl FDHGPV {
+    /// Initializes the [`FDHGPV`] with default parameters.
+    /// The setup function takes in the security parameter, the modulus, a length bound
+    /// for the signatures, and the length of randomness for this construction.
+    /// Then, the [`PSFGPV`] is instantiated with the default [`GadgetParameters`].
+    /// This PSF with an additional storage and hash function are secured in the struct.
+    ///
+    /// Parameters:
+    /// - `n`: The security parameter
+    /// - `q`: The modulus used for the G-Trapdoors
+    /// - `s`: The Gaussian parameter with which is sampled
+    ///
+    /// Returns an explicit instantiation of a FDH signature scheme using the default
+    /// parameters.
+    ///
+    /// # Example
+    /// ```
+    /// use qfall_crypto::construction::signature::{fdh::FDHGPV, SignatureScheme};
+    ///
+    /// let mut fdh = FDHGPV::setup(4, 113, 17);
+    /// ```
+    ///
+    /// # Panics ...
+    /// - if the security parameter n is not in [1, i64::MAX].    
+    /// - if `q <= 1`.
     pub fn setup(n: impl Into<Z>, q: impl Into<Modulus>, s: impl Into<Q>) -> Self {
         let (n, q, s) = (n.into(), q.into(), s.into());
         let psf = PSFGPV {
@@ -81,8 +102,11 @@ impl FDHGPV {
 }
 
 impl SignatureScheme for FDHGPV {
+    /// The trapdoor and a precomputed short basis that speeds up preimage sampling.
     type SecretKey = (MatZ, MatQ);
+    /// The public matrix defining the PSF, for which the secret key defines a trapdoor
     type PublicKey = MatZq;
+    /// Defined by the domain of the PSF.
     type Signature = MatZ;
 
     /// Generates a trapdoor by calling the `trap_gen` of the psf

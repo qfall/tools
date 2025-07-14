@@ -15,15 +15,15 @@
 //! This signature scheme uses a storage, so it is stateful.
 //!
 //! Requirements
-//! - `psf`: The PSF which has to implement the [`PSF`] trait and must also be
-//!   (de-)serializable.
+//! - `psf`: The PSF which has to implement the [`PSF`](crate::primitive::psf::PSF) trait
+//!   and must also be (de-)serializable.
 //! - `storage`: A Hashmap that safes all previously signed messages and their signature
 //! - `hash`: The hash-function which has to map a string into the correct domain
 //!
 //! # Example
 //! ## Signature Scheme from [`PSFGPV`](crate::primitive::psf::PSFGPV)
 //! ```
-//! use qfall_crypto::construction::signature::{FDHGPV, SignatureScheme};
+//! use qfall_crypto::construction::signature::{fdh::FDHGPV, SignatureScheme};
 //!
 //! let mut fdh = FDHGPV::setup(4, 113, 17);
 //!
@@ -35,8 +35,8 @@
 //! assert!(fdh.vfy(m.to_owned(), &sigma, &pk));
 //! ```
 
-pub mod gpv;
-pub mod gpv_ring;
+mod gpv;
+mod gpv_ring;
 
 pub use gpv::FDHGPV;
 pub use gpv_ring::FDHGPVRing;

@@ -1,4 +1,4 @@
-// Copyright © 2023 Phil Milewski, Marvin Beckmann
+// Copyright © 2023 Phil Milewski
 //
 // This file is part of qFALL-crypto.
 //
@@ -30,17 +30,16 @@ use qfall_math::{
 /// scheme with the explicit PSF [`PSFGPV`] which is generated using
 /// the default of [`GadgetParameters`].
 ///
-/// Parameters:
-/// - `n`: The security parameter
-/// - `q`: The modulus used for the G-Trapdoors
-/// - `s`: The Gaussian parameter with which is sampled
-/// - `randomness_length`: the number of bits used for the randomness
+/// Attributes:
+/// - `psf`: Defines the PSF needed for preimage sampling.
+/// - `hash`: Defines the hash function going from Strings to the PSFs range.
+/// - `randomness_length`: Defines the number of bits used for the randomness.
 ///
 /// Returns an explicit implementation of a PFDH-signature scheme.
 ///
 /// # Example
 /// ```
-/// use qfall_crypto::construction::signature::{PFDHGPV, SignatureScheme};
+/// use qfall_crypto::construction::signature::{pfdh::PFDHGPV, SignatureScheme};
 ///
 /// let mut pfdh = PFDHGPV::setup(4, 113, 17, 128);
 ///
@@ -51,9 +50,6 @@ use qfall_math::{
 ///
 /// assert!(pfdh.vfy(m.to_owned(), &sigma, &pk));
 /// ```
-///
-/// # Panics ...
-/// - if `q <= 1`.
 pub struct PFDHGPV {
     pub psf: PSFGPV,
     pub hash: HashMatZq,
@@ -61,6 +57,31 @@ pub struct PFDHGPV {
 }
 
 impl PFDHGPV {
+    /// Initializes the [`PFDHGPV`] with default parameters.
+    /// The setup function takes in the security parameter, the modulus, a length bound
+    /// for the signatures, and the length of randomness for this construction.
+    /// Then, the [`PSFGPV`] is instantiated with the default [`GadgetParameters`].
+    /// This PSF with an additional storage and hash function are secured in the struct.
+    ///
+    /// Parameters:
+    /// - `n`: The security parameter
+    /// - `q`: The modulus used for the G-Trapdoors
+    /// - `s`: The Gaussian parameter with which is sampled
+    /// - `randomness_length`: The length of the randomness.
+    ///
+    /// Returns an explicit instantiation of a PFDH signature scheme using the default
+    /// parameters.
+    ///
+    /// # Example
+    /// ```
+    /// use qfall_crypto::construction::signature::{pfdh::PFDHGPV, SignatureScheme};
+    ///
+    /// let mut pfdh = PFDHGPV::setup(4, 113, 17, 128);
+    /// ```
+    ///
+    /// # Panics ...
+    /// - if the security parameter n is not in [1, i64::MAX].
+    /// - if `q <= 1`.
     pub fn setup(
         n: impl Into<Z>,
         q: impl Into<Modulus>,
@@ -86,8 +107,11 @@ impl PFDHGPV {
 }
 
 impl SignatureScheme for PFDHGPV {
+    /// The trapdoor and a precomputed short basis that speeds up preimage sampling.
     type SecretKey = (MatZ, MatQ);
+    /// The public matrix defining the PSF, for which the secret key defines a trapdoor
     type PublicKey = MatZq;
+    /// Defined by the domain of the PSF and additional randomness.
     type Signature = (MatZ, Z);
 
     /// Generates a trapdoor by calling the `trap_gen` of the psf
