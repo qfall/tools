@@ -14,12 +14,13 @@ use crate::construction::{identity_based_encryption::DualRegevIBE, signature::PF
 use qfall_math::{integer::Z, integer_mod_q::Modulus, rational::Q};
 
 impl CCSfromIBE<DualRegevIBE, PFDHGPV> {
-    /// Initializes a [`CCSfromIBE`] PK encryption scheme from a [`DualRegevIBE`] and a [`PFDH`] signature.
+    /// Initializes a [`CCSfromIBE`] PK encryption scheme from a [`DualRegevIBE`] and
+    /// a PFDH signature, here [`PFDHGPV`].
     ///
     /// Parameters:
     /// - `n`: specifies the security parameter
     /// - `q`: specifies the modulus
-    /// - `r`: specifies the Gaussian parameter used for the [`PSFGPV`] for the [`PFDH`]
+    /// - `r`: specifies the Gaussian parameter used for the PSF for the [`PFDHGPV`]
     /// - `randomness_length`: specifies the number of bits added to the message before signing
     /// - `alpha`: specifies the Gaussian parameter used for encryption in
     ///   [`DualRegev`](crate::construction::pk_encryption::DualRegev) in the [`DualRegevIBE`]
@@ -56,8 +57,8 @@ impl CCSfromIBE<DualRegevIBE, PFDHGPV> {
         }
     }
 
-    /// Initializes a [`CCSfromIBE`] PK encryption scheme from a [`DualRegevIBE`] and a [`PFDH`] signature
-    /// from a given `n > 0`.
+    /// Initializes a [`CCSfromIBE`] PK encryption scheme from a [`DualRegevIBE`] and
+    /// a PFDH signature, here [`PFDHGPV`], from a given `n > 0`.
     ///
     /// Parameters:
     /// - `n`: specifies the security parameter
