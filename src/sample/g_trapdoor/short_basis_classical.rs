@@ -63,11 +63,8 @@ pub fn gen_short_basis_for_trapdoor(
 fn gen_sa_l(r: &MatZ) -> MatZ {
     let r_rows = r.get_num_rows();
     let r_cols = r.get_num_columns();
-    let mut sa_l = MatZ::new(r_rows + r_cols, r_rows + r_cols);
+    let mut sa_l = MatZ::identity(r_rows + r_cols, r_rows + r_cols);
 
-    for diagonal in 0..(r_rows + r_cols) {
-        unsafe { sa_l.set_entry_unchecked(diagonal, diagonal, 1) };
-    }
     sa_l.set_submatrix(0, r_rows, r, 0, 0, -1, -1).unwrap();
 
     sa_l
@@ -103,12 +100,16 @@ fn gen_sa_r(params: &GadgetParameters, tag: &MatZq, a: &MatZq) -> MatZ {
 
 /// Compute S for `[ 0 | I, S' | W ]`
 fn compute_s(params: &GadgetParameters) -> MatZ {
-    let id_k = MatZ::identity(&params.k, &params.k);
-    let mut sk = &params.base * id_k;
-    for i in 0..(sk.get_num_rows() - 1) {
+    let mut sk = MatZ::new(&params.k, &params.k);
+    let n: i64 = (&params.n).try_into().unwrap();
+    let k: i64 = (&params.k).try_into().unwrap();
+    for j in 0..k {
+        sk.set_entry(j, j, &params.base).unwrap();
+    }
+    for i in 0..k - 1 {
         sk.set_entry(i + 1, i, Z::MINUS_ONE).unwrap();
     }
-    sk = if params.base.pow(&params.k).unwrap() == params.q {
+    sk = if params.base.pow(k).unwrap() == params.q {
         // compute s in the special case where the modulus is a power of base
         // i.e. the last column can remain as it is
         sk
@@ -116,14 +117,27 @@ fn compute_s(params: &GadgetParameters) -> MatZ {
         // compute s for any arbitrary modulus
         // represent modulus in `base` and set last row accordingly
         let mut q = Z::from(&params.q);
-        for i in 0..(sk.get_num_rows()) {
+        for i in 0..k {
             let q_i = &q % &params.base;
-            sk.set_entry(i, sk.get_num_columns() - 1, &q_i).unwrap();
+            sk.set_entry(i, k - 1, &q_i).unwrap();
             q = (q - q_i).div_exact(&params.base).unwrap();
         }
         sk
     };
-    MatZ::identity(&params.n, &params.n).tensor_product(&sk)
+    let mut out = MatZ::new(n * k, n * k);
+    for j in 0..n {
+        out.set_submatrix(
+            j * sk.get_num_rows(),
+            j * sk.get_num_columns(),
+            &sk,
+            0,
+            0,
+            -1,
+            -1,
+        )
+        .unwrap();
+    }
+    out
 }
 
 /// Computes `W` with `GW = -H^{-1}A [ I | 0 ] mod q`
@@ -494,7 +508,7 @@ mod test_compute_w {
         .unwrap();
 
         let w = compute_w(&params, &tag, &a);
-        let g = gen_gadget_mat(&params.n, &params.k, &params.base);
+        let g = gen_gadget_mat((&params.n).try_into().unwrap(), &params.k, &params.base);
 
         let gw = MatZq::from((&(g * w), &params.q));
         let rhs = &a * MatZ::identity(a.get_num_columns(), &params.m_bar);
