@@ -27,8 +27,8 @@ use std::collections::HashMap;
 
 /// Initializes an FDH signature scheme from a [`PSFGPVRing`].
 /// The trapdoor is sampled with a Gaussian parameter of 1.005
-/// as done in [\[3\]](<index.html#:~:text=[3]>) who derived it from
-/// [\[5\]](<index.html#:~:text=[5]>).
+/// as done in [\[3\]](<crate::sample::g_trapdoor>) who derived it from
+/// [\[5\]](<crate::sample::g_trapdoor>).
 ///
 /// This function corresponds to an implementation of an FDH-signature
 /// scheme with the explicit PSF [`PSFGPVRing`] which is generated using
