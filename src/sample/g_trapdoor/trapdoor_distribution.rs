@@ -148,7 +148,7 @@ mod test_pm_one_zero {
 #[cfg(test)]
 mod test_sample_z {
     use super::{SampleZ, TrapdoorDistributionRing};
-    use qfall_math::{rational::Q, traits::*};
+    use qfall_math::traits::*;
 
     /// Ensure that the distribution samples are in the correct range,
     #[test]
@@ -162,7 +162,7 @@ mod test_sample_z {
 
             // test for concentration bound
             assert!(
-                Q::from(coeff_embedding.norm_eucl_sqrd().unwrap())
+                coeff_embedding.norm_eucl_sqrd().unwrap()
                     <= s.pow(2).unwrap() * coeff_embedding.get_num_rows()
             );
         }

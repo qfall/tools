@@ -6,12 +6,15 @@
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
-//! A ring implementation of the [`FDH`] scheme using the [`PSFGPVRing`]
+//! A ring implementation of the FDH signature scheme using the [`PSFGPVRing`]
 //! according to [\[1\]](<../index.html#:~:text=[1]>).
 
-use super::FDH;
 use crate::{
-    construction::hash::sha256::HashMatPolynomialRingZq, primitive::psf::PSFGPVRing,
+    construction::{
+        hash::{sha256::HashMatPolynomialRingZq, HashInto},
+        signature::SignatureScheme,
+    },
+    primitive::psf::{PSFGPVRing, PSF},
     sample::g_trapdoor::gadget_parameters::GadgetParametersRing,
 };
 use qfall_math::{
@@ -19,53 +22,87 @@ use qfall_math::{
     integer_mod_q::{MatPolynomialRingZq, Modulus},
     rational::Q,
 };
-use std::{collections::HashMap, marker::PhantomData};
+use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
 
-impl
-    FDH<
-        MatPolynomialRingZq,
-        (MatPolyOverZ, MatPolyOverZ),
-        MatPolyOverZ,
-        MatPolynomialRingZq,
-        PSFGPVRing,
-        HashMatPolynomialRingZq,
-    >
-{
-    /// Initializes an FDH signature scheme from a [`PSFGPVRing`].
-    /// The trapdoor is sampled with a Gaussian parameter of 1.005
-    /// as done in [\[3\]](<index.html#:~:text=[3]>) who derived it from
-    /// [\[5\]](<index.html#:~:text=[5]>).
-    ///
-    /// This function corresponds to an implementation of an FDH-signature
-    /// scheme with the explicit PSF [`PSFGPVRing`] which is generated using
-    /// the default of [`GadgetParametersRing`].
+/// Initializes an FDH signature scheme from a [`PSFGPVRing`].
+/// The trapdoor is sampled with a Gaussian parameter of 1.005
+/// as done in [\[3\]](<crate::sample::g_trapdoor>) who derived it from
+/// [\[5\]](<crate::sample::g_trapdoor>).
+///
+/// This function corresponds to an implementation of an FDH-signature
+/// scheme with the explicit PSF [`PSFGPVRing`] which is generated using
+/// the default of [`GadgetParametersRing`].
+///
+/// Attributes:
+/// - `psf`: Defines the PSF needed for preimage sampling.
+/// - `storage`: Stores all previously constructed signatures.
+/// - `hash`: Defines the hash function going from Strings to the PSFs range.
+///
+/// Returns an explicit implementation of an FDH-signature scheme.
+///
+/// # Example
+/// ```
+/// use qfall_crypto::construction::signature::fdh::FDHGPVRing;
+/// use crate::qfall_crypto::construction::signature::SignatureScheme;
+/// use qfall_math::rational::Q;
+///
+/// const MODULUS: i64 = 512;
+/// const N: i64 = 8;
+/// fn compute_s() -> Q {
+///     ((2 * 2 * Q::from(1.005_f64) * Q::from(N).sqrt() + 1) * 2) * 4
+/// }
+///
+/// let mut fdh = FDHGPVRing::setup(N, MODULUS, compute_s());
+/// let (pk, sk) = fdh.gen();
+/// let m = &format!("Hello World!");
+/// let sigma = fdh.sign(m.to_owned(), &sk, &pk);
+/// assert!(
+///     fdh.vfy(m.to_owned(), &sigma, &pk),
+/// );
+/// ```
+#[derive(Serialize, Deserialize)]
+pub struct FDHGPVRing {
+    pub psf: PSFGPVRing,
+    pub storage: HashMap<String, MatPolyOverZ>,
+    pub hash: HashMatPolynomialRingZq,
+}
+
+impl FDHGPVRing {
+    /// Initializes the [`FDHGPVRing`] with default parameters.
+    /// The setup function takes in the security parameter, the modulus, a length bound
+    /// for the signatures, and the length of randomness for this construction.
+    /// Then, the [`PSFGPVRing`] is instantiated with the default [`GadgetParametersRing`].
+    /// This PSF with an additional storage and hash function are secured in the struct.
     ///
     /// Parameters:
     /// - `n`: The security parameter
     /// - `q`: The modulus used for the G-Trapdoors
     /// - `s`: The Gaussian parameter with which is sampled
     ///
-    /// Returns an explicit implementation of an FDH-signature scheme.
+    /// Returns an explicit instantiation of a FDH signature scheme using the default
+    /// parameters.
     ///
     /// # Example
     /// ```
-    /// use qfall_crypto::construction::signature::{FDH, SignatureScheme};
+    /// use qfall_crypto::construction::signature::fdh::FDHGPVRing;
+    /// use crate::qfall_crypto::construction::signature::SignatureScheme;
+    /// use qfall_math::rational::Q;
     ///
-    /// let mut fdh = FDH::init_gpv_ring(8, 512, 100);
-    /// let (pk, sk) = fdh.gen();
+    /// const MODULUS: i64 = 512;
+    /// const N: i64 = 8;
+    /// fn compute_s() -> Q {
+    ///     ((2 * 2 * Q::from(1.005_f64) * Q::from(N).sqrt() + 1) * 2) * 4
+    /// }
     ///
-    /// let m = &format!("Hello World!");
-    ///
-    /// let sigma = fdh.sign(m.to_owned(), &sk, &pk);
-    /// assert!(fdh.vfy(m.to_owned(), &sigma, &pk));
+    /// let mut fdh = FDHGPVRing::setup(N, MODULUS, compute_s());
     /// ```
     ///
     /// # Panics ...
+    /// - if the security parameter n is not in [1, i64::MAX].    
     /// - if `q <= 1`.
-    pub fn init_gpv_ring(n: impl Into<Z>, q: impl Into<Modulus>, s: impl Into<Q>) -> Self {
-        let n = n.into();
-        let q = q.into();
-        let s = s.into();
+    pub fn setup(n: impl Into<Z>, q: impl Into<Modulus>, s: impl Into<Q>) -> Self {
+        let (n, q, s) = (n.into(), q.into(), s.into());
         let psf = PSFGPVRing {
             gp: GadgetParametersRing::init_default(&n, &q),
             s,
@@ -73,28 +110,65 @@ impl
         };
         let modulus = psf.gp.modulus.clone();
         Self {
-            psf: Box::new(psf),
+            psf,
             storage: HashMap::new(),
-            hash: Box::new(HashMatPolynomialRingZq {
+            hash: HashMatPolynomialRingZq {
                 modulus,
                 rows: 1,
                 cols: 1,
-            }),
-            _a_type: PhantomData,
-            _trapdoor_type: PhantomData,
-            _range_type: PhantomData,
+            },
         }
+    }
+}
+
+impl SignatureScheme for FDHGPVRing {
+    /// The trapdoor and a precomputed short basis that speeds up preimage sampling.
+    type SecretKey = (MatPolyOverZ, MatPolyOverZ);
+    /// The public matrix defining the PSF, for which the secret key defines a trapdoor
+    type PublicKey = MatPolynomialRingZq;
+    /// Defined by the domain of the PSF.
+    type Signature = MatPolyOverZ;
+
+    /// Generates a trapdoor by calling the `trap_gen` of the psf
+    fn gen(&mut self) -> (Self::PublicKey, Self::SecretKey) {
+        self.psf.trap_gen()
+    }
+
+    /// Firstly checks if the message has been signed before, and if, return that
+    /// signature, else it continues.
+    /// It hashes the message into the domain and then computes a signature using
+    /// `samp_p` from the psf with the trapdoor.
+    fn sign(&mut self, m: String, sk: &Self::SecretKey, pk: &Self::PublicKey) -> Self::Signature {
+        // check if it is in the HashMap
+        if let Some(sigma) = self.storage.get(&m) {
+            return sigma.clone();
+        }
+
+        let u = (self.hash).hash(&m);
+        let signature = self.psf.samp_p(pk, sk, &u);
+
+        // insert signature in HashMap
+        self.storage.insert(m, signature.clone());
+        signature
+    }
+
+    /// Checks if a signature is firstly within D_n, and then checks if
+    /// the signature is actually a valid preimage under `fa` of `hash(m)`.
+    fn vfy(&self, m: String, sigma: &Self::Signature, pk: &Self::PublicKey) -> bool {
+        if !self.psf.check_domain(sigma) {
+            return false;
+        }
+
+        let u = (self.hash).hash(&m);
+
+        self.psf.f_a(pk, sigma) == u
     }
 }
 
 #[cfg(test)]
 mod test_fdh {
-    use super::{PSFGPVRing, FDH};
-    use crate::{
-        construction::hash::sha256::HashMatPolynomialRingZq,
-        construction::signature::SignatureScheme,
-    };
-    use qfall_math::{integer::MatPolyOverZ, integer_mod_q::MatPolynomialRingZq, rational::Q};
+    use crate::construction::signature::{fdh::gpv_ring::FDHGPVRing, SignatureScheme};
+    use qfall_math::rational::Q;
 
     const MODULUS: i64 = 512;
     const N: i64 = 8;
@@ -105,7 +179,7 @@ mod test_fdh {
     /// Ensure that the generated signature is valid.
     #[test]
     fn ensure_valid_signature_is_generated() {
-        let mut fdh = FDH::init_gpv_ring(N, MODULUS, compute_s());
+        let mut fdh = FDHGPVRing::setup(N, MODULUS, compute_s());
         let (pk, sk) = fdh.gen();
 
         for i in 0..10 {
@@ -125,7 +199,7 @@ mod test_fdh {
     /// Ensure that an entry is actually added to the local storage.
     #[test]
     fn storage_filled() {
-        let mut fdh = FDH::init_gpv_ring(N, MODULUS, compute_s());
+        let mut fdh = FDHGPVRing::setup(N, MODULUS, compute_s());
 
         let m = "Hello World!";
         let (pk, sk) = fdh.gen();
@@ -139,7 +213,7 @@ mod test_fdh {
     /// Ensure that after deserialization the HashMap still contains all entries.
     #[test]
     fn reload_hashmap() {
-        let mut fdh = FDH::init_gpv_ring(N, MODULUS, compute_s());
+        let mut fdh = FDHGPVRing::setup(N, MODULUS, compute_s());
 
         // fill one entry in the HashMap
         let m = "Hello World!";
@@ -148,14 +222,7 @@ mod test_fdh {
 
         let fdh_string = serde_json::to_string(&fdh).expect("Unable to create a json object");
 
-        let fdh_2: FDH<
-            MatPolynomialRingZq,
-            (MatPolyOverZ, MatPolyOverZ),
-            MatPolyOverZ,
-            MatPolynomialRingZq,
-            PSFGPVRing,
-            HashMatPolynomialRingZq,
-        > = serde_json::from_str(&fdh_string).unwrap();
+        let fdh_2: FDHGPVRing = serde_json::from_str(&fdh_string).unwrap();
 
         assert_eq!(fdh.storage, fdh_2.storage);
     }

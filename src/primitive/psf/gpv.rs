@@ -56,7 +56,12 @@ pub struct PSFGPV {
     pub s: Q,
 }
 
-impl PSF<MatZq, (MatZ, MatQ), MatZ, MatZq> for PSFGPV {
+impl PSF for PSFGPV {
+    type A = MatZq;
+    type Trapdoor = (MatZ, MatQ);
+    type Domain = MatZ;
+    type Range = MatZq;
+
     /// Computes a G-Trapdoor according to the [`GadgetParameters`]
     /// defined in the struct.
     /// It returns a matrix `A` together with a short base and its GSO.

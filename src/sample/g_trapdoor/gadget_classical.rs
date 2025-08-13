@@ -58,7 +58,7 @@ pub fn gen_trapdoor(
     a_bar: &MatZq,
     tag: &MatZq,
 ) -> Result<(MatZq, MatZ), MathError> {
-    let g = gen_gadget_mat(&params.n, &params.k, &params.base);
+    let g = gen_gadget_mat((&params.n).try_into().unwrap(), &params.k, &params.base);
     let r = params
         .distribution
         .sample(&params.m_bar, &(&params.n * &params.k));
@@ -88,14 +88,22 @@ pub fn gen_trapdoor(
 /// # Panics ...
 /// - if `k < 1` or it does not fit into an [`i64`].
 /// - if `n < 1`.
-pub fn gen_gadget_mat(
-    n: impl TryInto<i64> + Display + Clone,
-    k: impl TryInto<i64> + Display,
-    base: &Z,
-) -> MatZ {
-    let gadget_vec = gen_gadget_vec(k, base);
-    let identity = MatZ::identity(n.clone(), n);
-    identity.tensor_product(&gadget_vec.transpose())
+pub fn gen_gadget_mat(n: i64, k: impl TryInto<i64> + Display, base: &Z) -> MatZ {
+    let gadget_vec = gen_gadget_vec(k, base).transpose();
+    let mut out = MatZ::new(n, n * gadget_vec.get_num_columns());
+    for j in 0..out.get_num_rows() {
+        out.set_submatrix(
+            j,
+            j * gadget_vec.get_num_columns(),
+            &gadget_vec,
+            0,
+            0,
+            -1,
+            -1,
+        )
+        .unwrap();
+    }
+    out
 }
 
 /// Generates a gadget vector based on its definition in [\[1\]](<../index.html#:~:text=[1]>).
@@ -118,9 +126,11 @@ pub fn gen_gadget_mat(
 /// # Panics ...
 /// - if `k < 1` or it does not fit into an [`i64`].
 pub fn gen_gadget_vec(k: impl TryInto<i64> + Display, base: &Z) -> MatZ {
+    let mut entry = Z::ONE;
     let mut out = MatZ::new(k, 1);
     for i in 0..out.get_num_rows() {
-        out.set_entry(i, 0, &base.pow(i).unwrap()).unwrap();
+        out.set_entry(i, 0, &entry).unwrap();
+        entry *= base
     }
     out
 }
@@ -209,12 +219,11 @@ pub fn find_solution_gadget_vec(value: &Zq, k: &Z, base: &Z) -> MatZ {
 pub fn find_solution_gadget_mat(value: &MatZq, k: &Z, base: &Z) -> MatZ {
     let mut out = MatZ::new(k * value.get_num_rows(), value.get_num_columns());
     for i in 0..value.get_num_columns() as usize {
-        let mut _out: MatZ = find_solution_gadget_vec(&value.get_entry(0, i).unwrap(), k, base);
-        for j in 1..value.get_num_rows() as usize {
+        for j in 0..value.get_num_rows() as usize {
             let sol_j = find_solution_gadget_vec(&value.get_entry(j, i).unwrap(), k, base);
-            _out = _out.concat_vertical(&sol_j).unwrap();
+            out.set_submatrix(k * j as u64, i, &sol_j, 0, 0, -1, 0)
+                .unwrap();
         }
-        out.set_column(i, &_out, 0).unwrap();
     }
     out
 }
@@ -310,7 +319,7 @@ mod test_gen_trapdoor {
             .unwrap();
 
         // ensure G = A*trapdoor (definition of a trapdoor)
-        let gadget_mat = gen_gadget_mat(&params.n, &params.k, &Z::from(2));
+        let gadget_mat = gen_gadget_mat(42, &params.k, &Z::from(2));
         assert_eq!(
             MatZq::from((&gadget_mat, &params.q)),
             a * MatZq::from((&trapdoor, &params.q))
@@ -339,7 +348,7 @@ mod test_gen_trapdoor {
             .unwrap();
 
         // ensure tag*G = A*trapdoor (definition of a trapdoor)
-        let gadget_mat = gen_gadget_mat(&params.n, &params.k, &Z::from(2));
+        let gadget_mat = gen_gadget_mat(42, &params.k, &Z::from(2));
         assert_eq!(
             tag * MatZq::from((&gadget_mat, &modulus)),
             a * MatZq::from((&trapdoor, &modulus))

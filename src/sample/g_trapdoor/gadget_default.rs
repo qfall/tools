@@ -135,9 +135,9 @@ mod test_gen_trapdoor_default {
     /// actually a trapdoor.
     #[test]
     fn ensure_is_trapdoor() {
-        for n in [5, 10, 25] {
+        for n in [5i64, 10, 25] {
             for k in [5, 10] {
-                let q = 2_i64.pow(k);
+                let q = 2_i64.pow(k as u32);
 
                 let (a, r) = gen_trapdoor_default(n, q);
 
