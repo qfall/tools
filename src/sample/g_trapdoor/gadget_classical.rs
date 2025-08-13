@@ -283,7 +283,6 @@ mod test_gen_gadget_mat {
                             [ 0, 0, 0, 0, 0, 1, 3, 9, 27, 81]]";
 
         let mat = MatZ::from_str(mat_str).unwrap();
-        println!("{gadget_mat}");
         assert_eq!(mat, gadget_mat);
     }
 }
