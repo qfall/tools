@@ -161,7 +161,7 @@ impl PSFPerturbation {
 ///     r: Q::from(3),
 ///     s: Q::from(25),
 /// };
-/// 
+///
 /// let short_basis_g = short_basis_gadget(&psf.gp);
 /// let short_basis_g_gso = MatQ::from(&short_basis_g).gso();
 ///
