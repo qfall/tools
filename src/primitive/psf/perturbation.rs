@@ -29,6 +29,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// Attributes
 /// - `gp`: Describes the gadget parameters with which the G-Trapdoor is generated
+/// - `r`: The rounding parameter
 /// - `s`: The Gaussian parameter with which is sampled
 ///
 /// # Examples
@@ -40,7 +41,8 @@ use serde::{Deserialize, Serialize};
 ///
 /// let psf = PSFPerturbation {
 ///     gp: GadgetParameters::init_default(8, 64),
-///     s: Q::from(12),
+///     r: Q::from(3),
+///     s: Q::from(25),
 /// };
 ///
 /// let (a, td) = psf.trap_gen();
@@ -58,12 +60,55 @@ pub struct PSFPerturbation {
 }
 
 impl PSFPerturbation {
-    /// Returns the Cholesky decomposition of `Σ_p = Σ - [R^t|I]^t * Σ_G * [R^t|I]`.
+    /// Computes √Σ_2 = √(r^2 * (b^2 + 1) * [R^t | I]^t * [R^t | I] - r^2 * I)
+    /// to perform non-spherical Gaussian sampling according to Algorithm 1 in
+    /// [\[3\]](<index.html#:~:text=[3]>).
+    /// This matrix is the second part of the secret key and needs to be precomputed
+    /// to execute [PSFPerturbation::samp_p].
+    /// [PSFPerturbation::trap_gen] outputs this matrix for `s^2 * I`, i.e. for discrete
+    /// Gaussian preimages centered around `0`. This function enables changing the
+    /// covariance matrix to any covariance matrix s.t. Σ_2 is positive definite.
+    ///
+    /// Parameters:
+    /// - `mat_r`: The trapdoor matrix `R`
+    /// - `mat_sigma`: The covariance matrix `Σ` to sample [`Self::samp_p`] with
+    ///
+    /// Returns a [`MatQ`] containing √Σ_2 = √(r^2 * (b^2 + 1) * [R^t | I]^t * [R^t | I] - r^2 * I)
+    /// if Σ_2 was positive definite.
+    ///
+    /// # Examples
+    /// ```
+    /// use qfall_crypto::primitive::psf::PSFPerturbation;
+    /// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParameters;
+    /// use qfall_math::rational::{Q, MatQ};
+    /// use qfall_crypto::primitive::psf::PSF;
+    /// use qfall_math::traits::*;
+    ///
+    /// let psf = PSFPerturbation {
+    ///     gp: GadgetParameters::init_default(8, 64),
+    ///     r: Q::from(3),
+    ///     s: Q::from(25),
+    /// };
+    ///
+    /// let (a, td) = psf.trap_gen();
+    ///
+    /// let cov_mat = psf.s.pow(2).unwrap() * &psf.r * MatQ::identity(a.get_num_columns(), a.get_num_columns());
+    /// let mat_sqrt_sigma_2 = psf.compute_sqrt_sigma_2(&td.0, &cov_mat);
+    /// let new_td = (td.0, mat_sqrt_sigma_2);
+    ///
+    /// let domain_sample = psf.samp_d();
+    /// let range_fa = psf.f_a(&a, &domain_sample);
+    /// let preimage = psf.samp_p(&a, &new_td, &range_fa);
+    ///
+    /// assert!(psf.check_domain(&preimage));
+    /// ```
+    ///
+    /// # Panics ...
+    /// - if Σ_2 is not positive definite.
     pub fn compute_sqrt_sigma_2(&self, mat_r: &MatZ, mat_sigma: &MatQ) -> MatQ {
         // Normalization factor according to MP12, Section 2.3
         let normalization_factor = 1.0 / (2.0 * Q::PI);
 
-        // TODO: Identity matrix potentially has wrong row-dimensions
         // full_td = [R^t | I]^t
         let full_td = mat_r
             .concat_vertical(&MatZ::identity(
@@ -170,9 +215,9 @@ impl PSF for PSFPerturbation {
     type Domain = MatZ;
     type Range = MatZq;
 
-    /// Computes a G-Trapdoor according to the [`GadgetParameters`]
-    /// defined in the struct.
-    /// It returns a matrix `A` together with a short base and its GSO.
+    /// Computes a G-Trapdoor according to the [`GadgetParameters`] defined in the struct.
+    /// It returns a matrix `A` together with the short trapdoor matrix `R` and a precomputed √Σ_2
+    /// for covariance matrix `s^2 * I`, i.e. for preimage sampling centered around `0`.
     ///
     /// # Examples
     /// ```
@@ -184,7 +229,7 @@ impl PSF for PSFPerturbation {
     /// let psf = PSFPerturbation {
     ///     gp: GadgetParameters::init_default(8, 64),
     ///     r: Q::from(3),
-    ///     s: Q::from(12),
+    ///     s: Q::from(25),
     /// };
     ///
     /// let (a, (sh_b, sh_b_gso)) = psf.trap_gen();
@@ -216,7 +261,7 @@ impl PSF for PSFPerturbation {
     /// let psf = PSFPerturbation {
     ///     gp: GadgetParameters::init_default(8, 64),
     ///     r: Q::from(3),
-    ///     s: Q::from(12),
+    ///     s: Q::from(25),
     /// };
     /// let (a, td) = psf.trap_gen();
     ///
@@ -227,21 +272,21 @@ impl PSF for PSFPerturbation {
         MatZ::sample_d_common(&m, &self.gp.n, &self.s).unwrap()
     }
 
-    /// Samples an `e` in the domain using SampleD with a short basis that is generated
-    /// from the G-Trapdoor from the conditioned conditioned
+    /// Samples an `e` in the domain using SampleD that is generated
+    /// from the G-Trapdoor from the conditioned
     /// discrete Gaussian with `f_a(a,e) = u` for a provided syndrome `u`.
     ///
-    /// *Note*: the provided parameters `a,r,u` must fit together,
+    /// *Note*: the provided parameters `mat_a, mat_r, vec_u` must fit together,
     /// otherwise unexpected behavior such as panics may occur.
     ///
     /// Parameters:
-    /// - `a`: The parity-check matrix
-    /// - `short_base`: The short base for `Λ^⟂(A)`
-    /// - `short_base_gso`: The precomputed GSO of the short_base
-    /// - `u`: The syndrome from the range
+    /// - `mat_a`: The parity-check matrix
+    /// - `mat_r`: The short trapdoor matrix `R`
+    /// - `mat_sqrt_sigma_2`: The precomputed √Σ_2
+    /// - `vec_u`: The syndrome from the range
     ///
     /// Returns a sample `e` from the domain on the conditioned discrete
-    /// Gaussian distribution `f_a(a,e) = u`.
+    /// Gaussian distribution `f_a(a,e) = u` with covariance matrix Σ depending on `mat_sqrt_sigma_2`.
     ///
     /// # Examples
     /// ```
@@ -253,7 +298,7 @@ impl PSF for PSFPerturbation {
     /// let psf = PSFPerturbation {
     ///     gp: GadgetParameters::init_default(8, 64),
     ///     r: Q::from(3),
-    ///     s: Q::from(12),
+    ///     s: Q::from(25),
     /// };
     /// let (a, td) = psf.trap_gen();
     /// let domain_sample = psf.samp_d();
@@ -289,13 +334,13 @@ impl PSF for PSFPerturbation {
     }
 
     /// Implements the efficiently computable function `f_a` which here corresponds to
-    /// `a*sigma`. The sigma must be from the domain, i.e. D_n.
+    /// `mat_a * sigma`. The sigma must be from the domain, i.e. D_n.
     ///
     /// Parameters:
-    /// - `a`: The parity-check matrix of dimensions `n x m`
+    /// - `mat_a`: The parity-check matrix of dimensions `n x m`
     /// - `sigma`: A column vector of length `m`
     ///
-    /// Returns `a*sigma`
+    /// Returns `mat_a * sigma`.
     ///
     /// # Examples
     /// ```
@@ -307,7 +352,7 @@ impl PSF for PSFPerturbation {
     /// let psf = PSFPerturbation {
     ///     gp: GadgetParameters::init_default(8, 64),
     ///     r: Q::from(3),
-    ///     s: Q::from(12),
+    ///     s: Q::from(25),
     /// };
     /// let (a, td) = psf.trap_gen();
     /// let domain_sample = psf.samp_d();
@@ -321,7 +366,7 @@ impl PSF for PSFPerturbation {
         mat_a * sigma
     }
 
-    /// Checks whether a value `sigma` is in D_n = {e ∈ Z^m | |e| <= s sqrt(m)}.
+    /// Checks whether a value `sigma` is in D_n = {e ∈ Z^m | |e| <= s * r * sqrt(m)}.
     ///
     /// Parameters:
     /// - `sigma`: The value for which is checked, if it is in the domain
@@ -338,7 +383,7 @@ impl PSF for PSFPerturbation {
     /// let psf = PSFPerturbation {
     ///     gp: GadgetParameters::init_default(8, 64),
     ///     r: Q::from(3),
-    ///     s: Q::from(12),
+    ///     s: Q::from(25),
     /// };
     /// let (a, td) = psf.trap_gen();
     ///
