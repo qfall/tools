@@ -11,9 +11,9 @@
 
 use super::PSF;
 use crate::sample::g_trapdoor::{
+    gadget_classical::short_basis_gadget,
     gadget_classical::{find_solution_gadget_mat, gen_trapdoor},
     gadget_parameters::GadgetParameters,
-    short_basis_classical::short_basis_gadget,
 };
 use qfall_math::{
     integer::{MatZ, Z},

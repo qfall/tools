@@ -228,6 +228,64 @@ pub fn find_solution_gadget_mat(value: &MatZq, k: &Z, base: &Z) -> MatZ {
     out
 }
 
+/// Outputs the short basis `S` of any gadget matrix `G`.
+///
+/// Parameters:
+/// - `params`: The [`GadgetParameters`] that define the gadget matrix `G`
+///
+/// Returns a [`MatZ`] a short basis matrix `S` for `G`.
+///
+/// # Examples
+/// ```
+/// use qfall_crypto::sample::g_trapdoor::{gadget_parameters::GadgetParameters,
+///     gadget_default::gen_trapdoor_default};
+/// use qfall_crypto::sample::g_trapdoor::gadget_classical::short_basis_gadget;
+///
+/// let params = GadgetParameters::init_default(10, 127);
+///
+/// let short_basis_gadget = short_basis_gadget(&params);
+/// ```
+pub fn short_basis_gadget(params: &GadgetParameters) -> MatZ {
+    let mut sk = MatZ::new(&params.k, &params.k);
+    let n: i64 = (&params.n).try_into().unwrap();
+    let k: i64 = (&params.k).try_into().unwrap();
+    for j in 0..k {
+        sk.set_entry(j, j, &params.base).unwrap();
+    }
+    for i in 0..k - 1 {
+        sk.set_entry(i + 1, i, Z::MINUS_ONE).unwrap();
+    }
+    sk = if params.base.pow(k).unwrap() == params.q {
+        // compute s in the special case where the modulus is a power of base
+        // i.e. the last column can remain as it is
+        sk
+    } else {
+        // compute s for any arbitrary modulus
+        // represent modulus in `base` and set last row accordingly
+        let mut q = Z::from(&params.q);
+        for i in 0..k {
+            let q_i = &q % &params.base;
+            sk.set_entry(i, k - 1, &q_i).unwrap();
+            q = (q - q_i).div_exact(&params.base).unwrap();
+        }
+        sk
+    };
+    let mut out = MatZ::new(n * k, n * k);
+    for j in 0..n {
+        out.set_submatrix(
+            j * sk.get_num_rows(),
+            j * sk.get_num_columns(),
+            &sk,
+            0,
+            0,
+            -1,
+            -1,
+        )
+        .unwrap();
+    }
+    out
+}
+
 #[cfg(test)]
 mod test_gen_gadget_vec {
     use crate::sample::g_trapdoor::gadget_classical::gen_gadget_vec;
@@ -418,5 +476,98 @@ mod test_find_solution_gadget {
             value.get_representative_least_nonnegative_residue(),
             gen_gadget_mat(3, &k, &base) * sol
         )
+    }
+}
+
+#[cfg(test)]
+mod test_short_basis_gadget {
+    use crate::sample::g_trapdoor::{
+        gadget_classical::short_basis_gadget, gadget_parameters::GadgetParameters,
+    };
+    use qfall_math::integer::{MatZ, Z};
+    use std::str::FromStr;
+
+    /// Ensure that the matrix s is computed correctly for a power-of-two modulus.
+    #[test]
+    fn base_2_power_two() {
+        let params = GadgetParameters::init_default(2, 16);
+
+        let s = short_basis_gadget(&params);
+
+        let s_cmp = MatZ::from_str(
+            "[[2, 0, 0, 0, 0, 0, 0, 0],\
+            [-1, 2, 0, 0, 0, 0, 0, 0],\
+            [0, -1, 2, 0, 0, 0, 0, 0],\
+            [0, 0, -1, 2, 0, 0, 0, 0],\
+            [0, 0, 0, 0, 2, 0, 0, 0],\
+            [0, 0, 0, 0, -1, 2, 0, 0],\
+            [0, 0, 0, 0, 0, -1, 2, 0],\
+            [0, 0, 0, 0, 0, 0, -1, 2]]",
+        )
+        .unwrap();
+        assert_eq!(s_cmp, s)
+    }
+
+    /// Ensure that the matrix s is computed correctly for a an arbitrary modulus.
+    #[test]
+    fn base_2_arbitrary() {
+        let q = Z::from(0b1100110);
+        let params = GadgetParameters::init_default(1, q);
+
+        let s = short_basis_gadget(&params);
+
+        let s_cmp = MatZ::from_str(
+            "[[2, 0, 0, 0, 0, 0, 0],\
+            [-1, 2, 0, 0, 0, 0, 1],\
+            [0, -1, 2, 0, 0, 0, 1],\
+            [0, 0, -1, 2, 0, 0, 0],\
+            [0, 0, 0, -1, 2, 0, 0],\
+            [0, 0, 0, 0, -1, 2, 1],\
+            [0, 0, 0, 0, 0, -1, 1]]",
+        )
+        .unwrap();
+
+        assert_eq!(s_cmp, s)
+    }
+
+    /// Ensure that the matrix s is computed correctly for a power-of-5 modulus.
+    #[test]
+    fn base_5_power_5() {
+        let mut params = GadgetParameters::init_default(1, 625);
+        params.k = Z::from(4);
+        params.base = Z::from(5);
+
+        let s = short_basis_gadget(&params);
+
+        let s_cmp = MatZ::from_str(
+            "[[5, 0, 0, 0],\
+            [-1, 5, 0, 0],\
+            [0, -1, 5, 0],\
+            [0, 0, -1, 5]]",
+        )
+        .unwrap();
+        assert_eq!(s_cmp, s)
+    }
+
+    /// Ensure that the matrix s is computed correctly for an arbitrary modulus with
+    /// base 5.
+    #[test]
+    fn base_5_arbitrary() {
+        let q = Z::from_str_b("4123", 5).unwrap();
+        let mut params = GadgetParameters::init_default(1, q);
+        params.k = Z::from(4);
+        params.base = Z::from(5);
+
+        let s = short_basis_gadget(&params);
+
+        let s_cmp = MatZ::from_str(
+            "[[5, 0, 0, 3],\
+            [-1, 5, 0, 2],\
+            [0, -1, 5, 1],\
+            [0, 0, -1, 4]]",
+        )
+        .unwrap();
+
+        assert_eq!(s_cmp, s)
     }
 }
