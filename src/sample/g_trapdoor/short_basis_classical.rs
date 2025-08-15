@@ -37,7 +37,7 @@ use qfall_math::{
 /// # Examples
 /// ```
 /// use qfall_crypto::sample::g_trapdoor::{gadget_parameters::GadgetParameters,
-/// gadget_default::gen_trapdoor_default};
+///     gadget_default::gen_trapdoor_default};
 /// use qfall_crypto::sample::g_trapdoor::short_basis_classical::gen_short_basis_for_trapdoor;
 /// use qfall_math::integer_mod_q::MatZq;
 ///
@@ -72,7 +72,7 @@ fn gen_sa_l(r: &MatZ) -> MatZ {
 
 /// Computes `[ 0 | I, S' | W ]`
 fn gen_sa_r(params: &GadgetParameters, tag: &MatZq, a: &MatZq) -> MatZ {
-    let mut s = compute_s(params);
+    let mut s = short_basis_gadget(params);
     // if `base^k = q`, then the reverse of `S` has a shorter diagonalization
     if params.base.pow(&params.k).unwrap() == params.q {
         s.reverse_columns();
@@ -98,8 +98,24 @@ fn gen_sa_r(params: &GadgetParameters, tag: &MatZq, a: &MatZq) -> MatZ {
     sa_r
 }
 
-/// Compute S for `[ 0 | I, S' | W ]`
-fn compute_s(params: &GadgetParameters) -> MatZ {
+/// Outputs the short basis `S` of any gadget matrix `G`.
+///
+/// Parameters:
+/// - `params`: The [`GadgetParameters`] that define the gadget matrix `G`
+///
+/// Returns a [`MatZ`] a short basis matrix `S` for `G`.
+///
+/// # Examples
+/// ```
+/// use qfall_crypto::sample::g_trapdoor::{gadget_parameters::GadgetParameters,
+///     gadget_default::gen_trapdoor_default};
+/// use qfall_crypto::sample::g_trapdoor::short_basis_classical::short_basis_gadget;
+///
+/// let params = GadgetParameters::init_default(10, 127);
+///
+/// let short_basis_gadget = short_basis_gadget(&params);
+/// ```
+pub fn short_basis_gadget(params: &GadgetParameters) -> MatZ {
     let mut sk = MatZ::new(&params.k, &params.k);
     let n: i64 = (&params.n).try_into().unwrap();
     let k: i64 = (&params.k).try_into().unwrap();
@@ -391,7 +407,7 @@ mod test_gen_sa {
 #[cfg(test)]
 mod test_compute_s {
     use crate::sample::g_trapdoor::{
-        gadget_parameters::GadgetParameters, short_basis_classical::compute_s,
+        gadget_parameters::GadgetParameters, short_basis_classical::short_basis_gadget,
     };
     use qfall_math::integer::{MatZ, Z};
     use std::str::FromStr;
@@ -401,7 +417,7 @@ mod test_compute_s {
     fn base_2_power_two() {
         let params = GadgetParameters::init_default(2, 16);
 
-        let s = compute_s(&params);
+        let s = short_basis_gadget(&params);
 
         let s_cmp = MatZ::from_str(
             "[[2, 0, 0, 0, 0, 0, 0, 0],\
@@ -423,7 +439,7 @@ mod test_compute_s {
         let q = Z::from(0b1100110);
         let params = GadgetParameters::init_default(1, q);
 
-        let s = compute_s(&params);
+        let s = short_basis_gadget(&params);
 
         let s_cmp = MatZ::from_str(
             "[[2, 0, 0, 0, 0, 0, 0],\
@@ -446,7 +462,7 @@ mod test_compute_s {
         params.k = Z::from(4);
         params.base = Z::from(5);
 
-        let s = compute_s(&params);
+        let s = short_basis_gadget(&params);
 
         let s_cmp = MatZ::from_str(
             "[[5, 0, 0, 0],\
@@ -467,7 +483,7 @@ mod test_compute_s {
         params.k = Z::from(4);
         params.base = Z::from(5);
 
-        let s = compute_s(&params);
+        let s = short_basis_gadget(&params);
 
         let s_cmp = MatZ::from_str(
             "[[5, 0, 0, 3],\

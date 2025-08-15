@@ -11,14 +11,15 @@
 
 use super::PSF;
 use crate::sample::g_trapdoor::{
-    gadget_classical::{gen_gadget_vec, gen_trapdoor},
+    gadget_classical::{find_solution_gadget_mat, gen_trapdoor},
     gadget_parameters::GadgetParameters,
+    short_basis_classical::short_basis_gadget,
 };
 use qfall_math::{
     integer::{MatZ, Z},
     integer_mod_q::MatZq,
     rational::{MatQ, Q},
-    traits::{Concatenate, MatrixDimensions, MatrixGetEntry, Pow},
+    traits::{Concatenate, MatrixDimensions, Pow},
 };
 use serde::{Deserialize, Serialize};
 
@@ -51,6 +52,7 @@ use serde::{Deserialize, Serialize};
 /// let preimage = psf.samp_p(&a, &td, &range_fa);
 ///
 /// assert!(psf.check_domain(&preimage));
+/// assert_eq!(a * preimage, range_fa);
 /// ```
 #[derive(Serialize, Deserialize)]
 pub struct PSFPerturbation {
@@ -123,7 +125,7 @@ impl PSFPerturbation {
             mat_sigma - (self.gp.base.pow(2).unwrap() + 1) * &full_td * full_td.transpose();
 
         // r^2 * Σ_p <=> r * √Σ_p
-        // Compute Σ_2 according to the requirements of Algorithm 1 in 2010/088
+        // Compute Σ_2 according to the requirements of Algorithm 1 in [3]
         // Assume Σ_1 = r^2 * B_1 * B_1^t with B_1 = I as basis for ZZ^n
         // Then, Σ_2 = Σ - Σ_1, where Σ = r^2 * Σ_p
         let sigma_2: MatQ = normalization_factor
@@ -136,77 +138,43 @@ impl PSFPerturbation {
     }
 }
 
-pub fn sample_gaussian_gadget(psf: &PSFPerturbation, vec_u: &MatZq) -> MatZ {
-    // make sure size of u and psf.n fit
-    assert_eq!(vec_u.get_num_rows(), i64::try_from(&psf.gp.n).unwrap());
-
-    // Assemble g^t
-    let vec_g_t = MatZq::from((
-        gen_gadget_vec(&psf.gp.k, &Z::from(&psf.gp.base)).transpose(),
-        &psf.gp.q,
-    ));
-
-    // Setup mutable buckets to store preimage vectors in
-    let mut buckets = vec![vec![]; u64::try_from(Z::from(&psf.gp.q)).unwrap() as usize];
-    // Setup storage for preimage vectors for each entry in order
-    let mut vectors = vec![];
-
-    for i in 0..vec_u.get_num_rows() {
-        // Find a preimage x s.t. <g, x> = u_i for each entry of u
-        let u_i: Z = vec_u.get_entry(i, 0).unwrap();
-        let u_i = i64::try_from(u_i).unwrap() as usize;
-
-        if buckets[u_i].is_empty() {
-            // if no sampled vector x \in ZZ_q^k is available s.t. <g, x> = u_i,
-            // sample until we found one
-            fill_bucket_until_ui_filled(psf, &mut buckets, &vec_g_t, u_i);
-        }
-
-        let vec_x_i = buckets[u_i].pop().unwrap();
-        vectors.push(vec_x_i);
-    }
-
-    // assemble vec_x \in ZZ_q^{m} s.t. G * vec_x = vec_u
-    let mut vec_x = vectors.first().unwrap().clone();
-    for i in 1..vectors.len() {
-        vec_x = vec_x.concat_vertical(vectors.get(i).unwrap()).unwrap();
-    }
-
-    // return vec_x
-    vec_x
-}
-
-/// Samples short vectors discrete Gaussian and computes `<g, x>` until the value equals `u_i`.
-/// Any sample is put into a bucket s.t. none is thrown out.
+/// Samples a preimage with respect to the gadget matrix `G` of `vec_u`.
 ///
 /// Parameters:
-/// - `psf`: simple passing of parameters `n, k, q, s_g`
-/// - `buckets`: mutable collection of vectors to store preimage-vectors in
-/// - `vec_g_t`: transposed gadget vector
-/// - `u_i`: i-th entry of target vector u
+/// - `psf`: The [`PSFPerturbation`] that sets the parameters for this function
+/// - `vec_u`: The target vector
 ///
-/// This algorithm is a subroutine of the `bucketing` approach
-/// described in Section 4.1 and 4.2 in [MP12](https://eprint.iacr.org/2011/501.pdf).
-fn fill_bucket_until_ui_filled(
-    psf: &PSFPerturbation,
-    buckets: &mut [Vec<MatZ>],
-    vec_g_t: &MatZq,
-    u_i: usize,
-) {
-    // Sample with width r * √Σ_G
+/// Returns a discrete Gaussian sampled preimage of `u` under `G` with Gaussian parameter `r * √(b^2 + 1)`.
+///
+/// # Examples
+/// ```compile_fail
+/// use qfall_crypto::primitive::psf::PSFPerturbation;
+/// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParameters;
+/// use qfall_math::rational::Q;
+/// use qfall_crypto::primitive::psf::PSF;
+///
+/// let psf = PSFPerturbation {
+///     gp: GadgetParameters::init_default(8, 64),
+///     r: Q::from(3),
+///     s: Q::from(25),
+/// };
+///
+/// let target = MatZq::sample_uniform(8, 1, 64);
+/// let preimage = randomized_nearest_plane_gadget(&osf, &target);
+/// ```
+pub(crate) fn randomized_nearest_plane_gadget(psf: &PSFPerturbation, vec_u: &MatZq) -> MatZ {
+    // s = r * √(b^2 + 1) according to Algorithm 3 in [1]
     let s = &psf.r * (psf.gp.base.pow(2).unwrap() + Z::ONE).sqrt();
 
-    while buckets[u_i].is_empty() {
-        // until no x \in ZZ_q^k is found s.t. <g, x> = u_i,
-        // sample discrete Gaussian vectors x
-        let vec_x = MatZ::sample_discrete_gauss(&psf.gp.k, 1, &psf.gp.n, 0, &s).unwrap();
+    // find solution s.t. G * long_solution = vec_u
+    let long_solution = find_solution_gadget_mat(vec_u, &psf.gp.k, &psf.gp.base);
 
-        let dot_product: Z = (vec_g_t * &vec_x).get_entry(0, 0).unwrap();
-        let dot_product: usize = i64::try_from(dot_product).unwrap() as usize;
+    // Get S as short basis of G
+    let short_base = short_basis_gadget(&psf.gp);
+    let center = MatQ::from(&(-1 * &long_solution));
 
-        // put x in bucket <g, x> s.t. it can be used later
-        buckets[dot_product].push(vec_x);
-    }
+    // just as PSFGPV::samp_p
+    long_solution + MatZ::sample_d(&short_base, &psf.gp.n, &center, &s).unwrap()
 }
 
 impl PSF for PSFPerturbation {
@@ -321,7 +289,7 @@ impl PSF for PSFPerturbation {
         let vec_v = vec_u - mat_a * &vec_p;
 
         // z <- D_{Λ_v^⊥(G), r * √Σ_G}
-        let vec_z = sample_gaussian_gadget(self, &vec_v);
+        let vec_z = randomized_nearest_plane_gadget(self, &vec_v);
 
         let full_td = mat_r
             .concat_vertical(&MatZ::identity(
