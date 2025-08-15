@@ -96,7 +96,7 @@ impl PSFPerturbation {
     ///
     /// let cov_mat = psf.s.pow(2).unwrap() * &psf.r * MatQ::identity(a.get_num_columns(), a.get_num_columns());
     /// let mat_sqrt_sigma_2 = psf.compute_sqrt_sigma_2(&td.0, &cov_mat);
-    /// let new_td = (td.0, mat_sqrt_sigma_2);
+    /// let new_td = (td.0, mat_sqrt_sigma_2, td.2);
     ///
     /// let domain_sample = psf.samp_d();
     /// let range_fa = psf.f_a(&a, &domain_sample);
@@ -143,6 +143,8 @@ impl PSFPerturbation {
 /// Parameters:
 /// - `psf`: The [`PSFPerturbation`] that sets the parameters for this function
 /// - `vec_u`: The target vector
+/// - `short_basis_gadget`: The short basis of the corresponding gadget-matrix - just required to speed up the algorithm
+/// - `short_basis_gadget_gso`: The GSO of the short basis of the gadget-matrix - just required to speed up the algorithm
 ///
 /// Returns a discrete Gaussian sampled preimage of `u` under `G` with Gaussian parameter `r * √(b^2 + 1)`.
 ///
@@ -150,6 +152,7 @@ impl PSFPerturbation {
 /// ```compile_fail
 /// use qfall_crypto::primitive::psf::PSFPerturbation;
 /// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParameters;
+/// use qfall_crypto::sample::g_trapdoor::gadget_classical::short_basis_gadget;
 /// use qfall_math::rational::Q;
 /// use qfall_crypto::primitive::psf::PSF;
 ///
@@ -158,34 +161,51 @@ impl PSFPerturbation {
 ///     r: Q::from(3),
 ///     s: Q::from(25),
 /// };
+/// 
+/// let short_basis_g = short_basis_gadget(&psf.gp);
+/// let short_basis_g_gso = MatQ::from(&short_basis_g).gso();
 ///
 /// let target = MatZq::sample_uniform(8, 1, 64);
-/// let preimage = randomized_nearest_plane_gadget(&osf, &target);
+/// let preimage = randomized_nearest_plane_gadget(&osf, &target, &short_basis_g, &short_basis_g_gso);
 /// ```
-pub(crate) fn randomized_nearest_plane_gadget(psf: &PSFPerturbation, vec_u: &MatZq) -> MatZ {
+pub(crate) fn randomized_nearest_plane_gadget(
+    psf: &PSFPerturbation,
+    vec_u: &MatZq,
+    short_basis_gadget: &MatZ,
+    short_basis_gadget_gso: &MatQ,
+) -> MatZ {
     // s = r * √(b^2 + 1) according to Algorithm 3 in [1]
     let s = &psf.r * (psf.gp.base.pow(2).unwrap() + Z::ONE).sqrt();
 
     // find solution s.t. G * long_solution = vec_u
     let long_solution = find_solution_gadget_mat(vec_u, &psf.gp.k, &psf.gp.base);
 
-    // Get S as short basis of G
-    let short_base = short_basis_gadget(&psf.gp);
     let center = MatQ::from(&(-1 * &long_solution));
 
     // just as PSFGPV::samp_p
-    long_solution + MatZ::sample_d(&short_base, &psf.gp.n, &center, &s).unwrap()
+    long_solution
+        + MatZ::sample_d_precomputed_gso(
+            short_basis_gadget,
+            short_basis_gadget_gso,
+            &psf.gp.n,
+            &center,
+            &s,
+        )
+        .unwrap()
 }
 
 impl PSF for PSFPerturbation {
     type A = MatZq;
-    type Trapdoor = (MatZ, MatQ);
+    type Trapdoor = (MatZ, MatQ, (MatZ, MatQ));
     type Domain = MatZ;
     type Range = MatZq;
 
     /// Computes a G-Trapdoor according to the [`GadgetParameters`] defined in the struct.
     /// It returns a matrix `A` together with the short trapdoor matrix `R` and a precomputed √Σ_2
     /// for covariance matrix `s^2 * I`, i.e. for preimage sampling centered around `0`.
+    /// The last part of the trapdoor tuple contains a short basis for the gadget matrix `G` and its
+    /// GSO, which removes the need to recompute the GSO for each iteration and speeds up preimage sampling
+    /// drastically.
     ///
     /// # Examples
     /// ```
@@ -200,9 +220,9 @@ impl PSF for PSFPerturbation {
     ///     s: Q::from(25),
     /// };
     ///
-    /// let (a, (sh_b, sh_b_gso)) = psf.trap_gen();
+    /// let (mat_a, (mat_r, mat_sqrt_sigma_2, (sh_b_g, sh_b_g_gso))) = psf.trap_gen();
     /// ```
-    fn trap_gen(&self) -> (MatZq, (MatZ, MatQ)) {
+    fn trap_gen(&self) -> (MatZq, (MatZ, MatQ, (MatZ, MatQ))) {
         let mat_a_bar = MatZq::sample_uniform(&self.gp.n, &self.gp.m_bar, &self.gp.q);
         let tag = MatZq::identity(&self.gp.n, &self.gp.n, &self.gp.q);
 
@@ -214,7 +234,17 @@ impl PSF for PSFPerturbation {
                 * MatQ::identity(mat_a.get_num_columns(), mat_a.get_num_columns())),
         );
 
-        (mat_a, (mat_r, mat_sqrt_sigma_2))
+        let short_basis_gadget = short_basis_gadget(&self.gp);
+        let short_basis_gadget_gso = MatQ::from(&short_basis_gadget).gso();
+
+        (
+            mat_a,
+            (
+                mat_r,
+                mat_sqrt_sigma_2,
+                (short_basis_gadget, short_basis_gadget_gso),
+            ),
+        )
     }
 
     /// Samples in the domain using SampleD with the standard basis and center `0`.
@@ -231,7 +261,7 @@ impl PSF for PSFPerturbation {
     ///     r: Q::from(3),
     ///     s: Q::from(25),
     /// };
-    /// let (a, td) = psf.trap_gen();
+    /// let (mat_a, td) = psf.trap_gen();
     ///
     /// let domain_sample = psf.samp_d();
     /// ```
@@ -268,17 +298,21 @@ impl PSF for PSFPerturbation {
     ///     r: Q::from(3),
     ///     s: Q::from(25),
     /// };
-    /// let (a, td) = psf.trap_gen();
+    /// let (mat_a, td) = psf.trap_gen();
     /// let domain_sample = psf.samp_d();
-    /// let range_fa = psf.f_a(&a, &domain_sample);
+    /// let range_fa = psf.f_a(&mat_a, &domain_sample);
     ///
-    /// let preimage = psf.samp_p(&a, &td, &range_fa);
-    /// assert_eq!(range_fa, psf.f_a(&a, &preimage))
+    /// let preimage = psf.samp_p(&mat_a, &td, &range_fa);
+    /// assert_eq!(range_fa, psf.f_a(&mat_a, &preimage))
     /// ```
     fn samp_p(
         &self,
         mat_a: &MatZq,
-        (mat_r, mat_sqrt_sigma_2): &(MatZ, MatQ),
+        (mat_r, mat_sqrt_sigma_2, (short_basis_gadget, short_basis_gadget_gso)): &(
+            MatZ,
+            MatQ,
+            (MatZ, MatQ),
+        ),
         vec_u: &MatZq,
     ) -> MatZ {
         // Sample perturbation p <- D_{ZZ^m, r * √Σ_p} - not correct for now. √Σ_p := as √Σ_2
@@ -289,7 +323,12 @@ impl PSF for PSFPerturbation {
         let vec_v = vec_u - mat_a * &vec_p;
 
         // z <- D_{Λ_v^⊥(G), r * √Σ_G}
-        let vec_z = randomized_nearest_plane_gadget(self, &vec_v);
+        let vec_z = randomized_nearest_plane_gadget(
+            self,
+            &vec_v,
+            short_basis_gadget,
+            short_basis_gadget_gso,
+        );
 
         let full_td = mat_r
             .concat_vertical(&MatZ::identity(
@@ -322,9 +361,9 @@ impl PSF for PSFPerturbation {
     ///     r: Q::from(3),
     ///     s: Q::from(25),
     /// };
-    /// let (a, td) = psf.trap_gen();
+    /// let (mat_a, td) = psf.trap_gen();
     /// let domain_sample = psf.samp_d();
-    /// let range_fa = psf.f_a(&a, &domain_sample);
+    /// let range_fa = psf.f_a(&mat_a, &domain_sample);
     /// ```
     ///
     /// # Panics ...
@@ -353,7 +392,7 @@ impl PSF for PSFPerturbation {
     ///     r: Q::from(3),
     ///     s: Q::from(25),
     /// };
-    /// let (a, td) = psf.trap_gen();
+    /// let (mat_a, td) = psf.trap_gen();
     ///
     /// let vector = psf.samp_d();
     ///
