@@ -113,7 +113,7 @@ impl PKEncryptionScheme for KPKE {
     /// - e <- Bin(eta_1, 0.5)^k centered around 0
     /// - t = A * s + e
     ///
-    /// Then, `pk = (A, t)` and `sk = s` are returned.
+    /// Then, `pk = (A^T, t)` and `sk = s` are returned.
     ///
     /// # Examples
     /// ```
@@ -149,7 +149,7 @@ impl PKEncryptionScheme for KPKE {
         // 18 𝐭 ← 𝐀 ∘ 𝐬 + 𝐞
         let vec_t = &mat_a * &vec_s + vec_e;
 
-        let pk = (mat_a, vec_t);
+        let pk = (mat_a.transpose(), vec_t);
         let sk = vec_s;
         (pk, sk)
     }
@@ -208,7 +208,7 @@ impl PKEncryptionScheme for KPKE {
         .unwrap();
 
         // 19 𝐮 ← NTT^−1(𝐀^⊺ ∘ 𝐲) + 𝐞_𝟏
-        let vec_u = pk.0.transpose() * &vec_y + vec_e_1;
+        let vec_u = &pk.0 * &vec_y + vec_e_1;
 
         // 20 𝜇 ← Decompress_1(ByteDecode_1(𝑚))
         let mu = encode_z_bitwise_in_polynomialringzq(&self.q, &message.into());
@@ -254,6 +254,8 @@ impl PKEncryptionScheme for KPKE {
 mod test_kpke {
     use crate::construction::pk_encryption::{k_pke::KPKE, PKEncryptionScheme};
 
+    /// Ensures that [`KPKE`] works for all ML-KEM specifications by
+    /// performing a round trip of several messages.
     #[test]
     fn correctness() {
         let k_pkes = [KPKE::ml_kem_512(), KPKE::ml_kem_768(), KPKE::ml_kem_1024()];
