@@ -10,5 +10,6 @@
 //!
 //! This can include specialized implementations for certain parameter sets, such as rotation matrices.
 
+pub mod common_encodings;
 pub mod common_moduli;
 pub mod rotation_matrix;

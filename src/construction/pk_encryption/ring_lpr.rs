@@ -10,13 +10,18 @@
 //! public key Ring-LPR encryption scheme.
 
 use super::PKEncryptionScheme;
-use crate::utils::common_moduli::new_anticyclic;
+use crate::utils::{
+    common_encodings::{
+        decode_z_bitwise_from_polynomialringzq, encode_z_bitwise_in_polynomialringzq,
+    },
+    common_moduli::new_anticyclic,
+};
 use qfall_math::{
     error::MathError,
-    integer::{PolyOverZ, Z},
-    integer_mod_q::{Modulus, ModulusPolynomialRingZq, PolynomialRingZq, Zq},
+    integer::Z,
+    integer_mod_q::{Modulus, ModulusPolynomialRingZq, PolynomialRingZq},
     rational::Q,
-    traits::{Distance, GetCoefficient, Pow, SetCoefficient},
+    traits::Pow,
 };
 use serde::{Deserialize, Serialize};
 
@@ -312,21 +317,6 @@ impl RingLPR {
     pub fn secure128() -> Self {
         Self::new(512, 92897729, 0.000005)
     }
-
-    /// Turns a [`Z`] instance into its bit representation, converts this bit representation
-    /// into a [`PolynomialRingZq`] with entries q/2 for any 1-bit and 0 as coefficient for any 0-bit.
-    fn z_into_polynomialringzq(&self, mu: &Z) -> PolynomialRingZq {
-        let bits = mu.to_bits();
-        let mut mu_q_half = PolynomialRingZq::from((PolyOverZ::default(), &self.q));
-        let q_half = self.q.get_q().div_floor(2);
-        for (i, bit) in bits.iter().enumerate() {
-            if *bit {
-                mu_q_half.set_coeff(i, &q_half).unwrap();
-            }
-        }
-
-        mu_q_half
-    }
 }
 
 impl Default for RingLPR {
@@ -424,7 +414,7 @@ impl PKEncryptionScheme for RingLPR {
         let message: Z = message.into().abs();
         let mu = message % Z::from(2).pow(&self.n).unwrap();
         // set mu_q_half to polynomial with n {0,1} coefficients
-        let mu_q_half = self.z_into_polynomialringzq(&mu);
+        let mu_q_half = encode_z_bitwise_in_polynomialringzq(&self.q, &mu);
 
         // r <- χ
         let r = PolynomialRingZq::sample_discrete_gauss(
@@ -490,23 +480,7 @@ impl PKEncryptionScheme for RingLPR {
         // res = v - s * u
         let result = &cipher.1 - sk * &cipher.0;
 
-        let q_half = self.q.get_q().div_floor(2);
-
-        // check for each coefficient whether it's closer to 0 or q/2
-        // if closer to q/2 -> add 2^i to result
-        let mut vec = vec![];
-        for i in 0..self.q.get_degree() {
-            let coeff: Zq = result.get_coeff(i).unwrap();
-            let coeff: Z = coeff.get_representative_least_absolute_residue().abs();
-
-            if coeff.distance(&q_half) < coeff.distance(Z::ZERO) {
-                vec.push(true);
-            } else {
-                vec.push(false);
-            }
-        }
-
-        Z::from_bits(&vec)
+        decode_z_bitwise_from_polynomialringzq(self.q.get_q(), &result)
     }
 }
 

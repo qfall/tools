@@ -13,12 +13,17 @@
 //! ML-KEM and mostly supposed to showcase the prototyping capabilities of the `qfall`-library.
 
 use crate::{
-    construction::pk_encryption::PKEncryptionScheme, utils::common_moduli::new_anticyclic,
+    construction::pk_encryption::PKEncryptionScheme,
+    utils::{
+        common_encodings::{
+            decode_z_bitwise_from_polynomialringzq, encode_z_bitwise_in_polynomialringzq,
+        },
+        common_moduli::new_anticyclic,
+    },
 };
 use qfall_math::{
-    integer::{PolyOverZ, Z},
-    integer_mod_q::{MatPolynomialRingZq, ModulusPolynomialRingZq, PolynomialRingZq, Zq},
-    traits::{Distance, GetCoefficient, SetCoefficient},
+    integer::Z,
+    integer_mod_q::{MatPolynomialRingZq, ModulusPolynomialRingZq, PolynomialRingZq},
 };
 use serde::{Deserialize, Serialize};
 
@@ -63,43 +68,6 @@ pub struct KPKE {
 }
 
 impl KPKE {
-    /// Turns a [`Z`] instance into its bit representation, converts this bit representation
-    /// into a [`PolynomialRingZq`] with entries q/2 for any 1-bit and 0 as coefficient for any 0-bit.
-    fn encode_z_bitwise_in_polynomialringzq(&self, mu: &Z) -> PolynomialRingZq {
-        let bits = mu.to_bits();
-        let mut mu_q_half = PolynomialRingZq::from((PolyOverZ::default(), &self.q));
-        let q_half = self.q.get_q().div_floor(2);
-        for (i, bit) in bits.iter().enumerate() {
-            if *bit {
-                mu_q_half.set_coeff(i, &q_half).unwrap();
-            }
-        }
-
-        mu_q_half
-    }
-
-    /// Checks for each coefficient of `poly` whether its value is closer to q/2 or 0
-    /// and sets the corresponding bit in the returned [`Z`] value to 1 or 0 respectively.
-    fn decode_z_bitwise_from_polynomialringzq(&self, poly: PolynomialRingZq) -> Z {
-        let q_half = self.q.get_q().div_floor(2);
-
-        // check for each coefficient whether it's closer to 0 or q/2
-        // if closer to q/2 -> add 2^i to result
-        let mut vec = vec![];
-        for i in 0..self.q.get_degree() {
-            let coeff: Zq = poly.get_coeff(i).unwrap();
-            let coeff: Z = coeff.get_representative_least_absolute_residue();
-
-            if coeff.distance(&q_half) < coeff.distance(Z::ZERO) {
-                vec.push(true);
-            } else {
-                vec.push(false);
-            }
-        }
-
-        Z::from_bits(&vec)
-    }
-
     /// Returns a [`KPKE`] instance with public parameters according to the ML-KEM-512 specification.
     pub fn ml_kem_512() -> Self {
         let q = new_anticyclic(256, 3329).unwrap();
@@ -243,7 +211,7 @@ impl PKEncryptionScheme for KPKE {
         let vec_u = pk.0.transpose() * &vec_y + vec_e_1;
 
         // 20 𝜇 ← Decompress_1(ByteDecode_1(𝑚))
-        let mu = self.encode_z_bitwise_in_polynomialringzq(&message.into());
+        let mu = encode_z_bitwise_in_polynomialringzq(&self.q, &message.into());
 
         // 21 𝑣 ← NTT^−1(𝐭^⊺ ∘ 𝐲) + 𝑒_2 + 𝜇
         let v = pk.1.dot_product(&vec_y).unwrap() + e_2 + mu;
@@ -278,7 +246,7 @@ impl PKEncryptionScheme for KPKE {
         let w = &cipher.1 - sk.dot_product(&cipher.0).unwrap();
 
         // 7 𝑚 ← ByteEncode_1(Compress_1(𝑤))
-        self.decode_z_bitwise_from_polynomialringzq(w)
+        decode_z_bitwise_from_polynomialringzq(self.q.get_q(), &w)
     }
 }
 
