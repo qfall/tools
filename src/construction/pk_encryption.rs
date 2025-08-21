@@ -36,6 +36,7 @@
 mod ccs_from_ibe;
 mod dual_regev;
 mod dual_regev_discrete_gauss;
+mod k_pke;
 mod lpr;
 mod regev;
 mod regev_discrete_gauss;
@@ -44,6 +45,7 @@ mod ring_lpr;
 pub use ccs_from_ibe::CCSfromIBE;
 pub use dual_regev::DualRegev;
 pub use dual_regev_discrete_gauss::DualRegevWithDiscreteGaussianRegularity;
+pub use k_pke::KPKE;
 pub use lpr::LPR;
 use qfall_math::integer::Z;
 pub use regev::Regev;
