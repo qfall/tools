@@ -91,10 +91,11 @@ impl PSFPerturbation {
     ///     r: Q::from(3),
     ///     s: Q::from(25),
     /// };
+    /// let different_s: f64 = 35.0;
     ///
     /// let (a, td) = psf.trap_gen();
     ///
-    /// let cov_mat = psf.s.pow(2).unwrap() * &psf.r * MatQ::identity(a.get_num_columns(), a.get_num_columns());
+    /// let cov_mat = different_s.powi(2) * MatQ::identity(a.get_num_columns(), a.get_num_columns());
     /// let mat_sqrt_sigma_2 = psf.compute_sqrt_sigma_2(&td.0, &cov_mat);
     /// let new_td = (td.0, mat_sqrt_sigma_2, td.2);
     ///
@@ -146,7 +147,8 @@ impl PSFPerturbation {
 /// - `short_basis_gadget`: The short basis of the corresponding gadget-matrix - just required to speed up the algorithm
 /// - `short_basis_gadget_gso`: The GSO of the short basis of the gadget-matrix - just required to speed up the algorithm
 ///
-/// Returns a discrete Gaussian sampled preimage of `u` under `G` with Gaussian parameter `r * √(b^2 + 1)`.
+/// Returns a discrete Gaussian sampled preimage of `u` under `G` with Gaussian parameter `r * √(b^2 + 1)`,
+/// where `b` is the base used for the G-trapdoor.
 ///
 /// # Examples
 /// ```compile_fail
@@ -267,7 +269,7 @@ impl PSF for PSFPerturbation {
     /// ```
     fn samp_d(&self) -> MatZ {
         let m = &self.gp.n * &self.gp.k + &self.gp.m_bar;
-        MatZ::sample_d_common(&m, &self.gp.n, &self.s).unwrap()
+        MatZ::sample_d_common(&m, &self.gp.n, &self.s * &self.r).unwrap()
     }
 
     /// Samples an `e` in the domain using SampleD that is generated
@@ -315,7 +317,7 @@ impl PSF for PSFPerturbation {
         ),
         vec_u: &MatZq,
     ) -> MatZ {
-        // Sample perturbation p <- D_{ZZ^m, r * √Σ_p} - not correct for now. √Σ_p := as √Σ_2
+        // Sample perturbation p <- D_{ZZ^m, r * √Σ_2}
         let vec_p =
             MatZ::sample_d_common_non_spherical(&self.gp.n, mat_sqrt_sigma_2, &self.r).unwrap();
 

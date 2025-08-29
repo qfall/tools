@@ -27,11 +27,11 @@
 
 mod gpv;
 mod gpv_ring;
-mod perturbation;
+mod mp_perturbation;
 
 pub use gpv::PSFGPV;
 pub use gpv_ring::PSFGPVRing;
-pub use perturbation::PSFPerturbation;
+pub use mp_perturbation::PSFPerturbation;
 
 /// This trait should be implemented by all constructions that are
 /// actual implementations of a preimage sampleable function.
