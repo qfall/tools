@@ -32,10 +32,15 @@
 //!   Chosen-ciphertext security from identity-based encryption.
 //!   In: Advances in Cryptology - EUROCRYPT 2004.
 //!   <https://link.springer.com/content/pdf/10.1007/b97182.pdf>
+//! - \[6\] National Institute of Standards and Technology (2024).
+//!   Module-Lattice-Based Key-Encapsulation Mechanism Standard.
+//!   Federal Information Processing Standards Publication (FIPS 203).
+//!   <https://doi.org/10.6028/NIST.FIPS.203>
 
 mod ccs_from_ibe;
 mod dual_regev;
 mod dual_regev_discrete_gauss;
+mod k_pke;
 mod lpr;
 mod regev;
 mod regev_discrete_gauss;
@@ -44,6 +49,7 @@ mod ring_lpr;
 pub use ccs_from_ibe::CCSfromIBE;
 pub use dual_regev::DualRegev;
 pub use dual_regev_discrete_gauss::DualRegevWithDiscreteGaussianRegularity;
+pub use k_pke::KPKE;
 pub use lpr::LPR;
 use qfall_math::integer::Z;
 pub use regev::Regev;
