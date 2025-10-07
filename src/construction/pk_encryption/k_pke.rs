@@ -30,9 +30,10 @@ use serde::{Deserialize, Serialize};
 /// This is a naive toy-implementation of the [`PKEncryptionScheme`] used
 /// as a basis for ML-KEM.
 ///
-/// This implementation is not supposed to be an implementation of the FIPS 203 standard, but
+/// This implementation is not supposed to be an implementation of the FIPS 203 standard in [\[6\]](<index.html#:~:text=[6]>), but
 /// is supposed to showcase the prototyping capabilities of `qfall` and does not cover compression algorithms
 /// as specified in the FIPS 203 document or might deviate for the choice of matrix multiplication algorithms.
+/// Especially, NTT-representation, sampling and multiplication are not part of this prototype.
 ///
 /// Attributes:
 /// - `q`: defines the modulus polynomial `(X^n + 1) mod p`
@@ -124,6 +125,7 @@ impl PKEncryptionScheme for KPKE {
     /// ```
     fn gen(&self) -> (Self::PublicKey, Self::SecretKey) {
         // 5 𝐀[𝑖,𝑗] ← SampleNTT(𝜌‖𝑗‖𝑖)
+        // Reminder: NTT-representation, sampling and multiplication are not part of this prototype
         let mat_a = MatPolynomialRingZq::sample_uniform(self.k, self.k, &self.q);
         // 9 𝐬[𝑖] ← SamplePolyCBD_𝜂_1(PRF_𝜂_1 (𝜎, 𝑁))
         let vec_s = MatPolynomialRingZq::sample_binomial_with_offset(
@@ -243,7 +245,7 @@ impl PKEncryptionScheme for KPKE {
     /// ```
     fn dec(&self, sk: &Self::SecretKey, (u, v): &Self::Cipher) -> Z {
         // 6 𝑤 ← 𝑣 − NTT^−1(𝐬^⊺ ∘ NTT(𝐮))
-        let w = &v - sk.dot_product(&u).unwrap();
+        let w = v - sk.dot_product(u).unwrap();
 
         // 7 𝑚 ← ByteEncode_1(Compress_1(𝑤))
         decode_z_bitwise_from_polynomialringzq(self.q.get_q(), &w)
