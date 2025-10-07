@@ -20,12 +20,18 @@
 //!   January. Implementation and evaluation of improved Gaussian sampling for lattice
 //!   trapdoors. In Proceedings of the 6th Workshop on Encrypted Computing & Applied
 //!   Homomorphic Cryptography (pp. 61-71). <https://dl.acm.org/doi/pdf/10.1145/3267973.3267975>
+//! - \[3\] Peikert, Chris.
+//!   An efficient and parallel Gaussian sampler for lattices.
+//!   In: Annual Cryptology Conference - CRYPTO 2010.
+//!   Springer, Berlin, Heidelberg. <https://doi.org/10.1007/978-3-642-14623-7_5>
 
 mod gpv;
 mod gpv_ring;
+mod mp_perturbation;
 
 pub use gpv::PSFGPV;
 pub use gpv_ring::PSFGPVRing;
+pub use mp_perturbation::PSFPerturbation;
 
 /// This trait should be implemented by all constructions that are
 /// actual implementations of a preimage sampleable function.
