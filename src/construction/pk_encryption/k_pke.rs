@@ -61,7 +61,7 @@ use serde::{Deserialize, Serialize};
 /// ```
 #[derive(Debug, Serialize, Deserialize)]
 pub struct KPKE {
-    q: ModulusPolynomialRingZq, // modulus (X^n + 1) mod q
+    q: ModulusPolynomialRingZq, // modulus (X^n + 1) mod p
     k: i64,                     // defines both dimensions of matrix A
     eta_1: i64, // defines the binomial distribution of the secret and error drawn in `gen`
     eta_2: i64, // defines the binomial distribution of the error drawn in `enc`
@@ -241,9 +241,9 @@ impl PKEncryptionScheme for KPKE {
     ///
     /// assert_eq!(1, m);
     /// ```
-    fn dec(&self, sk: &Self::SecretKey, cipher: &Self::Cipher) -> Z {
+    fn dec(&self, sk: &Self::SecretKey, (u, v): &Self::Cipher) -> Z {
         // 6 𝑤 ← 𝑣 − NTT^−1(𝐬^⊺ ∘ NTT(𝐮))
-        let w = &cipher.1 - sk.dot_product(&cipher.0).unwrap();
+        let w = &v - sk.dot_product(&u).unwrap();
 
         // 7 𝑚 ← ByteEncode_1(Compress_1(𝑤))
         decode_z_bitwise_from_polynomialringzq(self.q.get_q(), &w)
@@ -267,7 +267,6 @@ mod test_kpke {
                 let c = k_pke.enc(&pk, message);
                 let m = k_pke.dec(&sk, &c);
 
-                println!("{m}");
                 assert_eq!(message, m);
             }
         }
