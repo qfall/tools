@@ -11,14 +11,8 @@
 //! fundamental lattice-based cryptographic constructions, and samplable distributions/
 //! possibilities to sample instances of lattice problems to prototype
 //! lattice-based cryptographic constructions and more.
+//! Actual constructions can be found in [qfall-schemes](https://github.com/qfall/schemes)
 //!
-//! Currently qFALL-crypto supports 3 main construction types:
-//! - [Identity-Based Encryptions](construction::identity_based_encryption::IBEScheme)
-//! - [Public-Key Encryptions](construction::pk_encryption::PKEncryptionScheme)
-//! - [Signatures](construction::signature::SignatureScheme)
-//!
-//! These are identified by traits and then implemented for specific constructions, e.g.
-//! [`RingLPR`](construction::pk_encryption::RingLPR).
 //! Our library has further primitives useful for prototyping such as
 //! [`PSFs`](primitive::psf::PSF) that can be used to implement constructions.
 //!
