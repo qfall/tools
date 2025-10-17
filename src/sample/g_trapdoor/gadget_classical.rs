@@ -1,8 +1,8 @@
 // Copyright © 2023 Marvin Beckmann
 //
-// This file is part of qFALL-crypto.
+// This file is part of qFALL-tools.
 //
-// qFALL-crypto is free software: you can redistribute it and/or modify it under
+// qFALL-tools is free software: you can redistribute it and/or modify it under
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
@@ -34,7 +34,7 @@ use std::fmt::Display;
 ///
 /// # Examples
 /// ```
-/// use qfall_crypto::sample::g_trapdoor::{gadget_parameters::GadgetParameters, gadget_classical::gen_trapdoor};
+/// use qfall_tools::sample::g_trapdoor::{gadget_parameters::GadgetParameters, gadget_classical::gen_trapdoor};
 /// use qfall_math::integer_mod_q::MatZq;
 ///
 /// let params = GadgetParameters::init_default(42, 42);
@@ -79,7 +79,7 @@ pub fn gen_trapdoor(
 ///
 /// # Examples
 /// ```
-/// use qfall_crypto::sample::g_trapdoor::gadget_classical::gen_gadget_mat;
+/// use qfall_tools::sample::g_trapdoor::gadget_classical::gen_gadget_mat;
 /// use qfall_math::integer::Z;
 ///
 /// let g = gen_gadget_mat(4, 4, &Z::from(2));
@@ -117,7 +117,7 @@ pub fn gen_gadget_mat(n: i64, k: impl TryInto<i64> + Display, base: &Z) -> MatZ 
 ///
 /// # Examples
 /// ```
-/// use qfall_crypto::sample::g_trapdoor::gadget_classical::gen_gadget_vec;
+/// use qfall_tools::sample::g_trapdoor::gadget_classical::gen_gadget_vec;
 /// use qfall_math::integer::Z;
 ///
 /// let g = gen_gadget_vec(4, &Z::from(2));
@@ -147,7 +147,7 @@ pub fn gen_gadget_vec(k: impl TryInto<i64> + Display, base: &Z) -> MatZ {
 /// # Examples
 /// ```
 /// use qfall_math::{integer::{Z, MatZ}, integer_mod_q::Zq, traits::MatrixGetEntry};
-/// use qfall_crypto::sample::g_trapdoor::gadget_classical::{find_solution_gadget_vec, gen_gadget_vec};
+/// use qfall_tools::sample::g_trapdoor::gadget_classical::{find_solution_gadget_vec, gen_gadget_vec};
 /// use std::str::FromStr;
 ///
 /// let k = Z::from(5);
@@ -198,8 +198,8 @@ pub fn find_solution_gadget_vec(value: &Zq, k: &Z, base: &Z) -> MatZ {
 /// use qfall_math::integer::Z;
 /// use qfall_math::integer::MatZ;
 /// use qfall_math::integer_mod_q::MatZq;
-/// use qfall_crypto::sample::g_trapdoor::gadget_classical::find_solution_gadget_mat;
-/// use qfall_crypto::sample::g_trapdoor::gadget_classical::gen_gadget_mat;
+/// use qfall_tools::sample::g_trapdoor::gadget_classical::find_solution_gadget_mat;
+/// use qfall_tools::sample::g_trapdoor::gadget_classical::gen_gadget_mat;
 /// use std::str::FromStr;
 ///
 /// let k = Z::from(5);
@@ -237,9 +237,9 @@ pub fn find_solution_gadget_mat(value: &MatZq, k: &Z, base: &Z) -> MatZ {
 ///
 /// # Examples
 /// ```
-/// use qfall_crypto::sample::g_trapdoor::{gadget_parameters::GadgetParameters,
+/// use qfall_tools::sample::g_trapdoor::{gadget_parameters::GadgetParameters,
 ///     gadget_default::gen_trapdoor_default};
-/// use qfall_crypto::sample::g_trapdoor::gadget_classical::short_basis_gadget;
+/// use qfall_tools::sample::g_trapdoor::gadget_classical::short_basis_gadget;
 ///
 /// let params = GadgetParameters::init_default(10, 127);
 ///

@@ -1,8 +1,8 @@
 // Copyright © 2023 Niklas Siemer
 //
-// This file is part of qFALL-crypto.
+// This file is part of qFALL-tools.
 //
-// qFALL-crypto is free software: you can redistribute it and/or modify it under
+// qFALL-tools is free software: you can redistribute it and/or modify it under
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
@@ -27,7 +27,7 @@ use std::fmt::Display;
 ///
 /// # Examples
 /// ```
-/// use qfall_crypto::utils::common_moduli::new_anticyclic;
+/// use qfall_tools::utils::common_moduli::new_anticyclic;
 ///
 /// let poly_mod = new_anticyclic(8, 17);
 /// ```
@@ -58,7 +58,7 @@ pub fn new_anticyclic(
 ///
 /// # Examples
 /// ```
-/// use qfall_crypto::utils::common_moduli::new_cyclic;
+/// use qfall_tools::utils::common_moduli::new_cyclic;
 ///
 /// let poly_mod = new_cyclic(8, 17);
 /// ```

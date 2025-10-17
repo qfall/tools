@@ -1,17 +1,17 @@
 // Copyright © 2025 Niklas Siemer
 //
-// This file is part of qFALL-crypto.
+// This file is part of qFALL-tools.
 //
-// qFALL-crypto is free software: you can redistribute it and/or modify it under
+// qFALL-tools is free software: you can redistribute it and/or modify it under
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
 use criterion::{criterion_group, Criterion};
-use qfall_crypto::{
+use qfall_math::{integer_mod_q::MatZq, rational::Q};
+use qfall_tools::{
     primitive::psf::{PSFPerturbation, PSF, PSFGPV},
     sample::g_trapdoor::gadget_parameters::GadgetParameters,
 };
-use qfall_math::{integer_mod_q::MatZq, rational::Q};
 
 /// Benchmark [bench_psf] with `n = 8`.
 ///

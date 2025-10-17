@@ -2,8 +2,8 @@
 # Visit https://bit.ly/cffinit to generate yours today!
 
 cff-version: 1.2.0
-title: qFALL-crypto
-message: 'University Paderborn,  Codes and Cryptography'
+title: qFALL-tools
+message: "University Paderborn,  Codes and Cryptography"
 type: software
 authors:
   - given-names: Laurens
@@ -20,5 +20,5 @@ authors:
     family-names: Schmidt
   - given-names: Niklas
     family-names: Siemer
-repository-code: 'https://github.com/qfall/crypto'
+repository-code: "https://github.com/qfall/crypto"
 license: MPL-2.0

@@ -1,8 +1,8 @@
 // Copyright © 2023 Marvin Beckmann
 //
-// This file is part of qFALL-crypto.
+// This file is part of qFALL-tools.
 //
-// qFALL-crypto is free software: you can redistribute it and/or modify it under
+// qFALL-tools is free software: you can redistribute it and/or modify it under
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
@@ -41,7 +41,7 @@ use std::fmt::Display;
 ///
 /// # Examples
 /// ```
-/// use qfall_crypto::sample::g_trapdoor::{gadget_parameters::GadgetParametersRing, gadget_ring::gen_trapdoor_ring_lwe};
+/// use qfall_tools::sample::g_trapdoor::{gadget_parameters::GadgetParametersRing, gadget_ring::gen_trapdoor_ring_lwe};
 /// use qfall_math::integer::PolyOverZ;
 ///
 /// let params = GadgetParametersRing::init_default(8, 17);
@@ -92,7 +92,7 @@ pub fn gen_trapdoor_ring_lwe(
 ///
 /// # Examples
 /// ```
-/// use qfall_crypto::sample::g_trapdoor::gadget_ring::gen_gadget_ring;
+/// use qfall_tools::sample::g_trapdoor::gadget_ring::gen_gadget_ring;
 /// use qfall_math::integer::Z;
 ///
 /// let g = gen_gadget_ring(4, &Z::from(2));
@@ -121,9 +121,9 @@ pub fn gen_gadget_ring(k: impl TryInto<i64> + Display, base: &Z) -> MatPolyOverZ
 /// ```
 /// use qfall_math::integer::PolyOverZ;
 /// use qfall_math::integer_mod_q::PolynomialRingZq;
-/// use qfall_crypto::sample::g_trapdoor::gadget_ring::gen_gadget_ring;
-/// use qfall_crypto::sample::g_trapdoor::gadget_ring::find_solution_gadget_ring;
-/// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
+/// use qfall_tools::sample::g_trapdoor::gadget_ring::gen_gadget_ring;
+/// use qfall_tools::sample::g_trapdoor::gadget_ring::find_solution_gadget_ring;
+/// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
 /// use qfall_math::integer_mod_q::MatPolynomialRingZq;
 /// use std::str::FromStr;
 ///

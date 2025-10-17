@@ -1,8 +1,8 @@
 // Copyright © 2025 Niklas Siemer
 //
-// This file is part of qFALL-crypto.
+// This file is part of qFALL-tools.
 //
-// qFALL-crypto is free software: you can redistribute it and/or modify it under
+// qFALL-tools is free software: you can redistribute it and/or modify it under
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
@@ -35,10 +35,10 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Examples
 /// ```
-/// use qfall_crypto::primitive::psf::PSFPerturbation;
-/// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParameters;
+/// use qfall_tools::primitive::psf::PSFPerturbation;
+/// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParameters;
 /// use qfall_math::rational::Q;
-/// use qfall_crypto::primitive::psf::PSF;
+/// use qfall_tools::primitive::psf::PSF;
 ///
 /// let psf = PSFPerturbation {
 ///     gp: GadgetParameters::init_default(8, 64),
@@ -80,10 +80,10 @@ impl PSFPerturbation {
     ///
     /// # Examples
     /// ```
-    /// use qfall_crypto::primitive::psf::PSFPerturbation;
-    /// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParameters;
+    /// use qfall_tools::primitive::psf::PSFPerturbation;
+    /// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParameters;
     /// use qfall_math::rational::{Q, MatQ};
-    /// use qfall_crypto::primitive::psf::PSF;
+    /// use qfall_tools::primitive::psf::PSF;
     /// use qfall_math::traits::*;
     ///
     /// let psf = PSFPerturbation {
@@ -152,11 +152,11 @@ impl PSFPerturbation {
 ///
 /// # Examples
 /// ```compile_fail
-/// use qfall_crypto::primitive::psf::PSFPerturbation;
-/// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParameters;
-/// use qfall_crypto::sample::g_trapdoor::gadget_classical::short_basis_gadget;
+/// use qfall_tools::primitive::psf::PSFPerturbation;
+/// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParameters;
+/// use qfall_tools::sample::g_trapdoor::gadget_classical::short_basis_gadget;
 /// use qfall_math::rational::Q;
-/// use qfall_crypto::primitive::psf::PSF;
+/// use qfall_tools::primitive::psf::PSF;
 ///
 /// let psf = PSFPerturbation {
 ///     gp: GadgetParameters::init_default(8, 64),
@@ -211,10 +211,10 @@ impl PSF for PSFPerturbation {
     ///
     /// # Examples
     /// ```
-    /// use qfall_crypto::primitive::psf::PSFPerturbation;
-    /// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParameters;
+    /// use qfall_tools::primitive::psf::PSFPerturbation;
+    /// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParameters;
     /// use qfall_math::rational::Q;
-    /// use qfall_crypto::primitive::psf::PSF;
+    /// use qfall_tools::primitive::psf::PSF;
     ///
     /// let psf = PSFPerturbation {
     ///     gp: GadgetParameters::init_default(8, 64),
@@ -253,10 +253,10 @@ impl PSF for PSFPerturbation {
     ///
     /// # Examples
     /// ```
-    /// use qfall_crypto::primitive::psf::PSFPerturbation;
-    /// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParameters;
+    /// use qfall_tools::primitive::psf::PSFPerturbation;
+    /// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParameters;
     /// use qfall_math::rational::Q;
-    /// use qfall_crypto::primitive::psf::PSF;
+    /// use qfall_tools::primitive::psf::PSF;
     ///
     /// let psf = PSFPerturbation {
     ///     gp: GadgetParameters::init_default(8, 64),
@@ -290,10 +290,10 @@ impl PSF for PSFPerturbation {
     ///
     /// # Examples
     /// ```
-    /// use qfall_crypto::primitive::psf::PSFPerturbation;
-    /// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParameters;
+    /// use qfall_tools::primitive::psf::PSFPerturbation;
+    /// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParameters;
     /// use qfall_math::rational::Q;
-    /// use qfall_crypto::primitive::psf::PSF;
+    /// use qfall_tools::primitive::psf::PSF;
     ///
     /// let psf = PSFPerturbation {
     ///     gp: GadgetParameters::init_default(8, 64),
@@ -353,10 +353,10 @@ impl PSF for PSFPerturbation {
     ///
     /// # Examples
     /// ```
-    /// use qfall_crypto::primitive::psf::PSFPerturbation;
-    /// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParameters;
+    /// use qfall_tools::primitive::psf::PSFPerturbation;
+    /// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParameters;
     /// use qfall_math::rational::Q;
-    /// use qfall_crypto::primitive::psf::PSF;
+    /// use qfall_tools::primitive::psf::PSF;
     ///
     /// let psf = PSFPerturbation {
     ///     gp: GadgetParameters::init_default(8, 64),
@@ -384,9 +384,9 @@ impl PSF for PSFPerturbation {
     ///
     /// # Examples
     /// ```
-    /// use qfall_crypto::primitive::psf::PSF;
-    /// use qfall_crypto::primitive::psf::PSFPerturbation;
-    /// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParameters;
+    /// use qfall_tools::primitive::psf::PSF;
+    /// use qfall_tools::primitive::psf::PSFPerturbation;
+    /// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParameters;
     /// use qfall_math::rational::Q;
     ///
     /// let psf = PSFPerturbation {

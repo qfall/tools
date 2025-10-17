@@ -1,8 +1,8 @@
 // Copyright © 2023 Marvin Beckmann
 //
-// This file is part of qFALL-crypto.
+// This file is part of qFALL-tools.
 //
-// qFALL-crypto is free software: you can redistribute it and/or modify it under
+// qFALL-tools is free software: you can redistribute it and/or modify it under
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
@@ -26,7 +26,7 @@ use qfall_math::{integer::MatZ, traits::*};
 ///
 /// # Examples
 /// ```
-/// use qfall_crypto::utils::rotation_matrix::rot_minus;
+/// use qfall_tools::utils::rotation_matrix::rot_minus;
 /// use qfall_math::integer::MatZ;
 /// use std::str::FromStr;
 ///
@@ -75,7 +75,7 @@ pub fn rot_minus(vec: &MatZ) -> MatZ {
 ///
 /// # Examples
 /// ```
-/// use qfall_crypto::utils::rotation_matrix::rot_minus_matrix;
+/// use qfall_tools::utils::rotation_matrix::rot_minus_matrix;
 /// use qfall_math::integer::MatZ;
 /// use std::str::FromStr;
 ///

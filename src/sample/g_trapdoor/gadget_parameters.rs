@@ -1,8 +1,8 @@
 // Copyright © 2023 Marvin Beckmann
 //
-// This file is part of qFALL-crypto.
+// This file is part of qFALL-tools.
 //
-// qFALL-crypto is free software: you can redistribute it and/or modify it under
+// qFALL-tools is free software: you can redistribute it and/or modify it under
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
@@ -37,7 +37,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Examples
 /// ```
-/// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParameters;
+/// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParameters;
 ///
 /// let params = GadgetParameters::init_default(42, 42);
 /// ```
@@ -66,7 +66,7 @@ pub struct GadgetParameters {
 ///
 /// # Examples
 /// ```
-/// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
+/// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
 ///
 /// let params = GadgetParametersRing::init_default(42, 42);
 /// ```
@@ -102,7 +102,7 @@ impl GadgetParameters {
     ///
     /// # Examples
     /// ```
-    /// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParameters;
+    /// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParameters;
     ///
     /// let params = GadgetParameters::init_default(42, 42);
     /// ```
@@ -154,7 +154,7 @@ impl GadgetParametersRing {
     ///
     /// # Examples
     /// ```
-    /// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
+    /// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
     ///
     /// let params = GadgetParametersRing::init_default(42, 42);
     /// ```
