@@ -1,8 +1,8 @@
 // Copyright © 2023 Marvin Beckmann
 //
-// This file is part of qFALL-crypto.
+// This file is part of qFALL-tools.
 //
-// qFALL-crypto is free software: you can redistribute it and/or modify it under
+// qFALL-tools is free software: you can redistribute it and/or modify it under
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
@@ -39,9 +39,9 @@ use qfall_math::{
 ///
 /// # Examples
 /// ```
-/// use qfall_crypto::sample::g_trapdoor::{gadget_parameters::GadgetParameters,
+/// use qfall_tools::sample::g_trapdoor::{gadget_parameters::GadgetParameters,
 ///     gadget_default::gen_trapdoor_default};
-/// use qfall_crypto::sample::g_trapdoor::short_basis_classical::gen_short_basis_for_trapdoor;
+/// use qfall_tools::sample::g_trapdoor::short_basis_classical::gen_short_basis_for_trapdoor;
 /// use qfall_math::integer_mod_q::MatZq;
 ///
 /// let params = GadgetParameters::init_default(10, 127);

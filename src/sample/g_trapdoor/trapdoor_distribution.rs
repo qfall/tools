@@ -1,8 +1,8 @@
 // Copyright © 2023 Marvin Beckmann
 //
-// This file is part of qFALL-crypto.
+// This file is part of qFALL-tools.
 //
-// qFALL-crypto is free software: you can redistribute it and/or modify it under
+// qFALL-tools is free software: you can redistribute it and/or modify it under
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
@@ -72,7 +72,7 @@ impl TrapdoorDistribution for PlusMinusOneZero {
     ///
     /// # Examples
     /// ```
-    /// use qfall_crypto::sample::g_trapdoor::trapdoor_distribution::{PlusMinusOneZero, TrapdoorDistribution};
+    /// use qfall_tools::sample::g_trapdoor::trapdoor_distribution::{PlusMinusOneZero, TrapdoorDistribution};
     ///
     /// let mat = PlusMinusOneZero.sample(&42.into(), &24.into());
     /// ```
@@ -101,7 +101,7 @@ impl TrapdoorDistributionRing for SampleZ {
     ///
     /// # Examples
     /// ```
-    /// use qfall_crypto::sample::g_trapdoor::trapdoor_distribution::{SampleZ, TrapdoorDistributionRing};
+    /// use qfall_tools::sample::g_trapdoor::trapdoor_distribution::{SampleZ, TrapdoorDistributionRing};
     ///
     /// let mat = SampleZ.sample(&42.into(), &24.into(), &3.into());
     /// ```

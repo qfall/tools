@@ -1,8 +1,8 @@
 // Copyright © 2023 Marvin Beckmann
 //
-// This file is part of qFALL-crypto.
+// This file is part of qFALL-tools.
 //
-// qFALL-crypto is free software: you can redistribute it and/or modify it under
+// qFALL-tools is free software: you can redistribute it and/or modify it under
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
@@ -32,7 +32,7 @@ use qfall_math::{
 ///
 /// # Examples
 /// ```
-/// use qfall_crypto::sample::g_trapdoor::gadget_default::gen_trapdoor_default;
+/// use qfall_tools::sample::g_trapdoor::gadget_default::gen_trapdoor_default;
 ///
 /// let (a,r) = gen_trapdoor_default(42, 101);
 /// ```
@@ -71,7 +71,7 @@ pub fn gen_trapdoor_default(n: impl Into<Z>, q: impl Into<Modulus>) -> (MatZq, M
 ///
 /// # Examples
 /// ```
-/// use qfall_crypto::sample::g_trapdoor::gadget_default::gen_trapdoor_ring_default;
+/// use qfall_tools::sample::g_trapdoor::gadget_default::gen_trapdoor_ring_default;
 ///
 /// let (a,r, e) = gen_trapdoor_ring_default(100, 29, 10);;
 /// ```

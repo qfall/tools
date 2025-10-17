@@ -1,8 +1,8 @@
 // Copyright © 2023 Marvin Beckmann
 //
-// This file is part of qFALL-crypto.
+// This file is part of qFALL-tools.
 //
-// qFALL-crypto is free software: you can redistribute it and/or modify it under
+// qFALL-tools is free software: you can redistribute it and/or modify it under
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
@@ -41,10 +41,10 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Examples
 /// ```
-/// use qfall_crypto::primitive::psf::PSFGPVRing;
-/// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
+/// use qfall_tools::primitive::psf::PSFGPVRing;
+/// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
 /// use qfall_math::rational::Q;
-/// use qfall_crypto::primitive::psf::PSF;
+/// use qfall_tools::primitive::psf::PSF;
 ///
 /// let psf = PSFGPVRing {
 ///     gp: GadgetParametersRing::init_default(8, 512),
@@ -76,10 +76,10 @@ impl PSF for PSFGPVRing {
     ///
     /// # Examples
     /// ```
-    /// use qfall_crypto::primitive::psf::PSFGPVRing;
-    /// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
+    /// use qfall_tools::primitive::psf::PSFGPVRing;
+    /// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
     /// use qfall_math::rational::Q;
-    /// use qfall_crypto::primitive::psf::PSF;
+    /// use qfall_tools::primitive::psf::PSF;
     ///
     /// let psf = PSFGPVRing {
     ///     gp: GadgetParametersRing::init_default(8, 512),
@@ -101,10 +101,10 @@ impl PSF for PSFGPVRing {
     ///
     /// # Examples
     /// ```
-    /// use qfall_crypto::primitive::psf::PSFGPVRing;
-    /// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
+    /// use qfall_tools::primitive::psf::PSFGPVRing;
+    /// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
     /// use qfall_math::rational::Q;
-    /// use qfall_crypto::primitive::psf::PSF;
+    /// use qfall_tools::primitive::psf::PSF;
     ///
     /// let psf = PSFGPVRing {
     ///     gp: GadgetParametersRing::init_default(8, 512),
@@ -139,10 +139,10 @@ impl PSF for PSFGPVRing {
     ///
     /// # Examples
     /// ```
-    /// use qfall_crypto::primitive::psf::PSFGPVRing;
-    /// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
+    /// use qfall_tools::primitive::psf::PSFGPVRing;
+    /// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
     /// use qfall_math::rational::Q;
-    /// use qfall_crypto::primitive::psf::PSF;
+    /// use qfall_tools::primitive::psf::PSF;
     ///
     /// let psf = PSFGPVRing {
     ///     gp: GadgetParametersRing::init_default(8, 512),
@@ -223,10 +223,10 @@ impl PSF for PSFGPVRing {
     ///
     /// # Examples
     /// ```
-    /// use qfall_crypto::primitive::psf::PSFGPVRing;
-    /// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
+    /// use qfall_tools::primitive::psf::PSFGPVRing;
+    /// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
     /// use qfall_math::rational::Q;
-    /// use qfall_crypto::primitive::psf::PSF;
+    /// use qfall_tools::primitive::psf::PSF;
     ///
     /// let psf = PSFGPVRing {
     ///     gp: GadgetParametersRing::init_default(8, 512),
@@ -256,10 +256,10 @@ impl PSF for PSFGPVRing {
     ///
     /// # Examples
     /// ```
-    /// use qfall_crypto::primitive::psf::PSFGPVRing;
-    /// use qfall_crypto::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
+    /// use qfall_tools::primitive::psf::PSFGPVRing;
+    /// use qfall_tools::sample::g_trapdoor::gadget_parameters::GadgetParametersRing;
     /// use qfall_math::rational::Q;
-    /// use qfall_crypto::primitive::psf::PSF;
+    /// use qfall_tools::primitive::psf::PSF;
     ///
     /// let psf = PSFGPVRing {
     ///     gp: GadgetParametersRing::init_default(8, 512),
