@@ -9,9 +9,6 @@
 
 use criterion::criterion_main;
 
-pub mod k_pke;
-pub mod pfdh;
 pub mod psf;
-pub mod regev;
 
-criterion_main! {regev::benches, pfdh::benches, k_pke::benches, psf::benches}
+criterion_main! {psf::benches}

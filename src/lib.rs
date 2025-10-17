@@ -33,7 +33,6 @@
 //! qFALL-crypto is co-developed together with qFALL-math which provides the basic
 //! foundation that is used to implement the cryptographic constructions.
 
-pub mod construction;
 pub mod primitive;
 pub mod sample;
 pub mod utils;
