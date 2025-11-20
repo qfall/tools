@@ -186,14 +186,8 @@ pub(crate) fn randomized_nearest_plane_gadget(
 
     // just as PSFGPV::samp_p
     long_solution
-        + MatZ::sample_d_precomputed_gso(
-            short_basis_gadget,
-            short_basis_gadget_gso,
-            &psf.gp.n,
-            &center,
-            &s,
-        )
-        .unwrap()
+        + MatZ::sample_d_precomputed_gso(short_basis_gadget, short_basis_gadget_gso, &center, &s)
+            .unwrap()
 }
 
 impl PSF for PSFPerturbation {
@@ -269,7 +263,7 @@ impl PSF for PSFPerturbation {
     /// ```
     fn samp_d(&self) -> MatZ {
         let m = &self.gp.n * &self.gp.k + &self.gp.m_bar;
-        MatZ::sample_d_common(&m, &self.gp.n, &self.s * &self.r).unwrap()
+        MatZ::sample_discrete_gauss(m, 1, 0, &self.s * &self.r).unwrap()
     }
 
     /// Samples an `e` in the domain using SampleD that is generated
@@ -318,8 +312,7 @@ impl PSF for PSFPerturbation {
         vec_u: &MatZq,
     ) -> MatZ {
         // Sample perturbation p <- D_{ZZ^m, r * √Σ_2}
-        let vec_p =
-            MatZ::sample_d_common_non_spherical(&self.gp.n, mat_sqrt_sigma_2, &self.r).unwrap();
+        let vec_p = MatZ::sample_d_common_non_spherical(mat_sqrt_sigma_2, &self.r).unwrap();
 
         // v = u - A * p
         let vec_v = vec_u - mat_a * &vec_p;

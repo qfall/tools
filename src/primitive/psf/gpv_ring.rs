@@ -117,7 +117,7 @@ impl PSF for PSFGPVRing {
     /// ```
     fn samp_d(&self) -> MatPolyOverZ {
         let dimension = self.gp.modulus.get_degree() * (&self.gp.k + 2);
-        let sample = MatZ::sample_d_common(dimension, &self.gp.n, &self.s).unwrap();
+        let sample = MatZ::sample_discrete_gauss(dimension, 1, 0, &self.s).unwrap();
         MatPolyOverZ::from_coefficient_embedding((&sample, self.gp.modulus.get_degree() - 1))
     }
 
@@ -205,7 +205,6 @@ impl PSF for PSFGPVRing {
             + MatPolyOverZ::sample_d(
                 &short_basis,
                 self.gp.modulus.get_degree(),
-                &self.gp.n,
                 &center_embedded,
                 &self.s,
             )
