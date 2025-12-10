@@ -14,14 +14,12 @@
 //!   Federal Information Processing Standards Publication (FIPS 203).
 //!   <https://doi.org/10.6028/NIST.FIPS.203>
 
+use flint_sys::fmpz_poly::fmpz_poly_set_coeff_fmpz;
 use qfall_math::{
     integer::{MatPolyOverZ, PolyOverZ, Z},
     integer_mod_q::{MatPolynomialRingZq, ModulusPolynomialRingZq, PolynomialRingZq},
-    traits::{
-        GetCoefficient, MatrixDimensions, MatrixGetEntry, MatrixSetEntry, Pow,
-    },
+    traits::{GetCoefficient, MatrixDimensions, MatrixGetEntry, MatrixSetEntry, Pow},
 };
-use flint_sys::fmpz_poly::fmpz_poly_set_coeff_fmpz;
 
 /// This trait is implemented by data-structures, which may use lossy compression by dropping lower order bits
 /// as specified in [\[1\]](<index.html#:~:text=[1]>).
@@ -38,7 +36,7 @@ pub trait LossyCompressionFIPS203 {
     ///
     /// Parameters:
     /// - `d`: specifies the number of bits that is kept to represent values
-    /// 
+    ///
     /// Returns a new instance of type [`Self::CompressedType`] containing the compressed coefficients with a loss-factor
     /// defined by `q` and `d`.
     ///
@@ -53,13 +51,17 @@ pub trait LossyCompressionFIPS203 {
     ///
     /// Parameters:
     /// - `d`: specifies the number of bits that was kept during compression
-    /// 
+    ///
     /// Returns a new instance of type [`Self`] with decompressed values according to the loss-factor
     /// defined by `q` and `d`.
     ///
     /// # Panics ...
     /// - if `d` is smaller than `1`.
-    fn lossy_decompress(compressed: &Self::CompressedType, d: impl Into<Z>, modulus: &Self::ModulusType) -> Self;
+    fn lossy_decompress(
+        compressed: &Self::CompressedType,
+        d: impl Into<Z>,
+        modulus: &Self::ModulusType,
+    ) -> Self;
 }
 
 impl LossyCompressionFIPS203 for PolynomialRingZq {
@@ -73,7 +75,7 @@ impl LossyCompressionFIPS203 for PolynomialRingZq {
     ///
     /// Parameters:
     /// - `d`: specifies the number of bits that is kept to represent each value
-    /// 
+    ///
     /// Returns a [`PolyOverZ`] containing the compressed coefficients with a loss-factor
     /// defined by `q` and `d`.
     ///
@@ -123,7 +125,7 @@ impl LossyCompressionFIPS203 for PolynomialRingZq {
     /// - `compressed`: specifies the compressed value
     /// - `d`: specifies the number of bits that was kept during compression
     /// - `modulus`: specifies the modulus of the returned value
-    /// 
+    ///
     /// Returns a [`PolynomialRingZq`] with decompressed values according to the loss-factor
     /// defined by `q` and `d`.
     ///
@@ -141,10 +143,14 @@ impl LossyCompressionFIPS203 for PolynomialRingZq {
     ///
     /// # Panics ...
     /// - if `d` is smaller than `1`.
-    fn lossy_decompress(compressed: &Self::CompressedType, d: impl Into<Z>, modulus: &Self::ModulusType) -> Self {
+    fn lossy_decompress(
+        compressed: &Self::CompressedType,
+        d: impl Into<Z>,
+        modulus: &Self::ModulusType,
+    ) -> Self {
         let d = d.into();
         assert!(d >= Z::ONE, "Performing this function with d < 1 implies reducing mod 1, leaving no information to recover. Choose a larger parameter d.");
-        let two_pow_d_minus_1 = Z::from(2).pow(d-1).unwrap();
+        let two_pow_d_minus_1 = Z::from(2).pow(d - 1).unwrap();
         let two_pow_d = &two_pow_d_minus_1 * 2;
         let q = modulus.get_q();
 
@@ -177,7 +183,7 @@ impl LossyCompressionFIPS203 for MatPolynomialRingZq {
     ///
     /// Parameters:
     /// - `d`: specifies the number of bits that is kept to represent each value
-    /// 
+    ///
     /// Returns a [`MatPolyOverZ`] containing the compressed coefficients with a loss-factor
     /// defined by `q` and `d`.
     ///
@@ -219,7 +225,7 @@ impl LossyCompressionFIPS203 for MatPolynomialRingZq {
     /// - `compressed`: specifies the compressed matrix
     /// - `d`: specifies the number of bits that was kept during compression
     /// - `modulus`: specifies the modulus of the returned value
-    /// 
+    ///
     /// Returns a [`MatPolynomialRingZq`] with decompressed values according to the loss-factor
     /// defined by `q` and `d`.
     ///
@@ -237,10 +243,18 @@ impl LossyCompressionFIPS203 for MatPolynomialRingZq {
     ///
     /// # Panics ...
     /// - if `d` is smaller than `1`.
-    fn lossy_decompress(compressed: &Self::CompressedType, d: impl Into<Z>, modulus: &Self::ModulusType) -> Self {
+    fn lossy_decompress(
+        compressed: &Self::CompressedType,
+        d: impl Into<Z>,
+        modulus: &Self::ModulusType,
+    ) -> Self {
         let d = d.into();
 
-        let mut out = MatPolynomialRingZq::new(compressed.get_num_rows(), compressed.get_num_columns(), modulus);
+        let mut out = MatPolynomialRingZq::new(
+            compressed.get_num_rows(),
+            compressed.get_num_columns(),
+            modulus,
+        );
 
         for row in 0..compressed.get_num_rows() {
             for col in 0..compressed.get_num_columns() {
