@@ -18,9 +18,10 @@ use qfall_math::{
     integer::Z,
     integer_mod_q::{MatPolynomialRingZq, PolynomialRingZq},
     traits::{
-        GetCoefficient, MatrixDimensions, MatrixGetEntry, MatrixSetEntry, Pow, SetCoefficient,
+        GetCoefficient, MatrixDimensions, MatrixGetEntry, MatrixSetEntry, Pow,
     },
 };
+use flint_sys::fmpz_poly::fmpz_poly_set_coeff_fmpz;
 
 /// This trait is implemented by data-structures, which may use lossy compression by dropping lower order bits
 /// as specified in [\[1\]](<index.html#:~:text=[1]>).
@@ -77,14 +78,18 @@ impl LossyCompression for PolynomialRingZq {
         assert!(d >= Z::ONE, "Performing this function with d < 1 implies reducing mod 1, leaving no information to recover. Choose a larger parameter d.");
         let two_pow_d = Z::from(2).pow(d).unwrap();
         let q = self.get_mod().get_q();
+        let q_div_2 = q.div_floor(2);
 
         for coeff_i in 0..=self.get_degree() {
             let mut coeff: Z = unsafe { self.get_coeff_unchecked(coeff_i) };
 
             coeff *= &two_pow_d;
-            let res = (coeff / &q).round() % &q;
+            coeff += &q_div_2;
+            let mut res = coeff.div_floor(&q) % &q;
 
-            unsafe { self.set_coeff_unchecked(coeff_i, res) };
+            unsafe {
+                fmpz_poly_set_coeff_fmpz(self.get_fmpz_poly_struct(), coeff_i, res.get_fmpz());
+            };
         }
     }
 
@@ -113,16 +118,20 @@ impl LossyCompression for PolynomialRingZq {
     fn decompress(&mut self, d: impl Into<Z>) {
         let d = d.into();
         assert!(d >= Z::ONE, "Performing this function with d < 1 implies reducing mod 1, leaving no information to recover. Choose a larger parameter d.");
-        let two_pow_d = Z::from(2).pow(d).unwrap();
+        let two_pow_d_minus_1 = Z::from(2).pow(d-1).unwrap();
+        let two_pow_d = &two_pow_d_minus_1 * 2;
         let q = self.get_mod().get_q();
 
         for coeff_i in 0..=self.get_degree() {
             let mut coeff: Z = unsafe { self.get_coeff_unchecked(coeff_i) };
 
             coeff *= &q;
-            let res = (coeff / &two_pow_d).round();
+            coeff += &two_pow_d_minus_1;
+            let mut res = coeff.div_floor(&two_pow_d);
 
-            unsafe { self.set_coeff_unchecked(coeff_i, res) };
+            unsafe {
+                fmpz_poly_set_coeff_fmpz(self.get_fmpz_poly_struct(), coeff_i, res.get_fmpz());
+            };
         }
     }
 }
