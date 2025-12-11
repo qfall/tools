@@ -106,7 +106,7 @@ impl LossyCompressionFIPS203 for PolynomialRingZq {
 
             coeff *= &two_pow_d;
             coeff += &q_div_2;
-            let mut res = coeff.div_floor(&q) % &q;
+            let mut res = coeff.div_floor(&q) % &two_pow_d;
 
             unsafe {
                 fmpz_poly_set_coeff_fmpz(out.get_fmpz_poly_struct(), coeff_i, res.get_fmpz());
