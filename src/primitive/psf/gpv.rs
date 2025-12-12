@@ -112,7 +112,7 @@ impl PSF for PSFGPV {
     /// ```
     fn samp_d(&self) -> MatZ {
         let m = &self.gp.n * &self.gp.k + &self.gp.m_bar;
-        MatZ::sample_d_common(&m, &self.gp.n, &self.s).unwrap()
+        MatZ::sample_discrete_gauss(&m, 1, 0, &self.s).unwrap()
     }
 
     /// Samples an `e` in the domain using SampleD with a short basis that is generated
@@ -157,14 +157,7 @@ impl PSF for PSFGPV {
 
         let center = MatQ::from(&(-1 * &sol));
 
-        sol + MatZ::sample_d_precomputed_gso(
-            short_base,
-            short_base_gso,
-            &self.gp.n,
-            &center,
-            &self.s,
-        )
-        .unwrap()
+        sol + MatZ::sample_d_precomputed_gso(short_base, short_base_gso, &center, &self.s).unwrap()
     }
 
     /// Implements the efficiently computable function `f_a` which here corresponds to

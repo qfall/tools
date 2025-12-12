@@ -12,4 +12,5 @@
 
 pub mod common_encodings;
 pub mod common_moduli;
+pub mod lossy_compression;
 pub mod rotation_matrix;
