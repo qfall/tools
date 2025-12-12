@@ -404,8 +404,8 @@ impl PSF for PSFPerturbation {
 
 #[cfg(test)]
 mod test_psf_perturbation {
-    use super::PSFPerturbation;
     use super::PSF;
+    use super::PSFPerturbation;
     use crate::sample::g_trapdoor::gadget_parameters::GadgetParameters;
     use qfall_math::integer::MatZ;
     use qfall_math::rational::Q;

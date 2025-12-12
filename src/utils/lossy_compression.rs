@@ -94,7 +94,10 @@ impl LossyCompressionFIPS203 for PolynomialRingZq {
     /// - if `d` is smaller than `1`.
     fn lossy_compress(&self, d: impl Into<Z>) -> Self::CompressedType {
         let d = d.into();
-        assert!(d >= Z::ONE, "Performing this function with d < 1 implies reducing mod 1, leaving no information to recover. Choose a larger parameter d.");
+        assert!(
+            d >= Z::ONE,
+            "Performing this function with d < 1 implies reducing mod 1, leaving no information to recover. Choose a larger parameter d."
+        );
         let two_pow_d = Z::from(2).pow(d).unwrap();
         let q = self.get_mod().get_q();
         let q_div_2 = q.div_floor(2);
@@ -149,7 +152,10 @@ impl LossyCompressionFIPS203 for PolynomialRingZq {
         modulus: &Self::ModulusType,
     ) -> Self {
         let d = d.into();
-        assert!(d >= Z::ONE, "Performing this function with d < 1 implies reducing mod 1, leaving no information to recover. Choose a larger parameter d.");
+        assert!(
+            d >= Z::ONE,
+            "Performing this function with d < 1 implies reducing mod 1, leaving no information to recover. Choose a larger parameter d."
+        );
         let two_pow_d_minus_1 = Z::from(2).pow(d - 1).unwrap();
         let two_pow_d = &two_pow_d_minus_1 * 2;
         let q = modulus.get_q();
