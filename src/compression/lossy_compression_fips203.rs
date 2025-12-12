@@ -6,13 +6,7 @@
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
-//! Implements lossy (de-)compression as specified in ML-KEM.
-//!
-//! Reference:
-//! - \[1\] National Institute of Standards and Technology (2024).
-//!   Module-Lattice-Based Key-Encapsulation Mechanism Standard.
-//!   Federal Information Processing Standards Publication (FIPS 203).
-//!   <https://doi.org/10.6028/NIST.FIPS.203>
+//! Implements lossy (de-)compression as specified in FIPS 203, i.e. ML-KEM / Kyber.
 
 use flint_sys::fmpz_poly::fmpz_poly_set_coeff_fmpz;
 use qfall_math::{
@@ -82,7 +76,7 @@ impl LossyCompressionFIPS203 for PolynomialRingZq {
     /// # Examples
     /// ```
     /// use qfall_math::integer_mod_q::PolynomialRingZq;
-    /// use qfall_tools::utils::{common_moduli::new_anticyclic, lossy_compression::LossyCompressionFIPS203};
+    /// use qfall_tools::{utils::common_moduli::new_anticyclic, compression::LossyCompressionFIPS203};
     ///
     /// let modulus = new_anticyclic(16, 257).unwrap();
     /// let mut poly = PolynomialRingZq::sample_uniform(&modulus);
@@ -135,7 +129,7 @@ impl LossyCompressionFIPS203 for PolynomialRingZq {
     /// # Examples
     /// ```
     /// use qfall_math::integer_mod_q::PolynomialRingZq;
-    /// use qfall_tools::utils::{common_moduli::new_anticyclic, lossy_compression::LossyCompressionFIPS203};
+    /// use qfall_tools::{utils::common_moduli::new_anticyclic, compression::LossyCompressionFIPS203};
     ///
     /// let modulus = new_anticyclic(16, 257).unwrap();
     /// let mut poly = PolynomialRingZq::sample_uniform(&modulus);
@@ -196,7 +190,7 @@ impl LossyCompressionFIPS203 for MatPolynomialRingZq {
     /// # Examples
     /// ```
     /// use qfall_math::integer_mod_q::MatPolynomialRingZq;
-    /// use qfall_tools::utils::{common_moduli::new_anticyclic, lossy_compression::LossyCompressionFIPS203};
+    /// use qfall_tools::{utils::common_moduli::new_anticyclic, compression::LossyCompressionFIPS203};
     ///
     /// let modulus = new_anticyclic(16, 257).unwrap();
     /// let mut poly = MatPolynomialRingZq::sample_uniform(2, 3, &modulus);
@@ -238,7 +232,7 @@ impl LossyCompressionFIPS203 for MatPolynomialRingZq {
     /// # Examples
     /// ```
     /// use qfall_math::integer_mod_q::MatPolynomialRingZq;
-    /// use qfall_tools::utils::{common_moduli::new_anticyclic, lossy_compression::LossyCompressionFIPS203};
+    /// use qfall_tools::{utils::common_moduli::new_anticyclic, compression::LossyCompressionFIPS203};
     ///
     /// let modulus = new_anticyclic(16, 257).unwrap();
     /// let mut poly = MatPolynomialRingZq::sample_uniform(2, 3, &modulus);
@@ -276,7 +270,7 @@ impl LossyCompressionFIPS203 for MatPolynomialRingZq {
 
 #[cfg(test)]
 mod test_compression_poly {
-    use crate::utils::{common_moduli::new_anticyclic, lossy_compression::LossyCompressionFIPS203};
+    use crate::{compression::LossyCompressionFIPS203, utils::common_moduli::new_anticyclic};
     use qfall_math::{
         integer::Z,
         integer_mod_q::PolynomialRingZq,
@@ -346,7 +340,7 @@ mod test_compression_poly {
 
 #[cfg(test)]
 mod test_compression_matrix {
-    use crate::utils::{common_moduli::new_anticyclic, lossy_compression::LossyCompressionFIPS203};
+    use crate::{compression::LossyCompressionFIPS203, utils::common_moduli::new_anticyclic};
     use qfall_math::{
         integer::Z,
         integer_mod_q::{MatPolynomialRingZq, PolynomialRingZq},
