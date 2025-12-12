@@ -27,6 +27,8 @@ cargo add qfall-tools
 
 ## What does qFALL-tools offer?
 qFALL-tools offers several commonly used sub-modules specific to lattice-based cryptography.
+- [Compression Techniques](https://docs.rs/qfall-tools/latest/qfall_tools/compression/index.html)
+  - [Lossy Compression according to FIPS 203](https://docs.rs/qfall-tools/latest/qfall_tools/compression/trait.LossyCompressionFIPS203.html)
 - [Preimage Samplable Functions (PSF)](https://docs.rs/qfall-tools/latest/qfall_tools/primitive/psf/index.html)
   - [GPV-based PSF over Z_q](https://docs.rs/qfall-tools/latest/qfall_tools/primitive/psf/struct.PSFGPV.html)
   - [GPV-based PSF over R_q](https://docs.rs/qfall-tools/latest/qfall_tools/primitive/psf/struct.PSFGPVRing.html)
@@ -35,12 +37,7 @@ qFALL-tools offers several commonly used sub-modules specific to lattice-based c
   - [G-trapdoor incl. short basis](https://docs.rs/qfall-tools/latest/qfall_tools/sample/g_trapdoor/gadget_classical/index.html)
   - [Ring-based G-trapdoor incl. short basis](https://docs.rs/qfall-tools/latest/qfall_tools/sample/g_trapdoor/gadget_ring/index.html)
 
-Furthermore, this crate simplifies the implementation of your prototype by supporting a range of utility functions to quickly instantiate commonly used moduli, matrices, or encodings.
-- [Utility functions](https://docs.rs/qfall-tools/latest/qfall_tools/utils/index.html)
-  - [Common encodings](https://docs.rs/qfall-tools/latest/qfall_tools/utils/common_encodings/index.html)
-  - [Common moduli](https://docs.rs/qfall-tools/latest/qfall_tools/utils/common_moduli/index.html)
-  - [Lossy Compression](https://docs.rs/qfall-tools/latest/qfall_tools/utils/lossy_compression/index.html)
-  - [Rotation matrices](https://docs.rs/qfall-tools/latest/qfall_tools/utils/rotation_matrix/index.html)
+Furthermore, this crate simplifies the implementation of your prototype by supporting a range of [utility functions](https://docs.rs/qfall-tools/latest/qfall_tools/utils/index.html) to quickly instantiate [commonly used moduli](https://docs.rs/qfall-tools/latest/qfall_tools/utils/common_moduli/index.html), [rotation matrices](https://docs.rs/qfall-tools/latest/qfall_tools/utils/rotation_matrix/index.html), and [encodings](https://docs.rs/qfall-tools/latest/qfall_tools/utils/common_encodings/index.html).
 
 ## Quick Examples
 From String to Encoding for Encryption
