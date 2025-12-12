@@ -6,7 +6,7 @@
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
-//! This module contains functions to generate G-Trapdoors with default parameters.
+//! This module contains functions to generate G-trapdoors with default parameters.
 
 use crate::sample::g_trapdoor::{
     gadget_classical::gen_trapdoor,

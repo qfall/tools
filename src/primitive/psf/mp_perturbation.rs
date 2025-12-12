@@ -6,8 +6,8 @@
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
-//! Implements a Perturbation MP12 PSF according to [\[1\]](<../index.html#:~:text=[1]>)
-//! using G-Trapdoors and corresponding trapdoor.
+//! Implements a [`PSF`] based on perturbation sampling desribed in [\[1\]](<../index.html#:~:text=[1]>)
+//! using G-trapdoors.
 
 use super::PSF;
 use crate::sample::g_trapdoor::{

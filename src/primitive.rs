@@ -6,8 +6,10 @@
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
-//! This module contains mathematical primitives that are useful for cryptographic
-//! constructions/purposes, but themselves do not provide security guarantees like
-//! confidentiality, integrity, ...
+//! Contains primitives that are useful for cryptographic
+//! constructions, but are solely targeted to be used in other constructions.
+//! 
+//! More specifically, this module contains primitives that do not provide security
+//! guarantees targeted at end-users such as confidentiality, integrity, etc.
 
 pub mod psf;

@@ -6,7 +6,7 @@
 [<img alt="build" src="https://img.shields.io/github/actions/workflow/status/qfall/tools/push.yml?branch=main&style=for-the-badge" height="20">](https://github.com/qfall/tools/actions/workflows/push.yml)
 [<img alt="license" src="https://img.shields.io/badge/License-MPL_2.0-blue.svg?style=for-the-badge" height="20">](https://github.com/qfall/tools/blob/dev/LICENSE)
 
-`qFALL` is a prototyping library for lattice-based constructions.
+`qFALL` is a prototyping library for lattice-based cryptography.
 This `tools`-crate collects common sub-modules and features used by lattice-based constructions to simplify and accelerate the development of such.
 
 ## Quick-Start
@@ -45,15 +45,15 @@ Furthermore, this crate simplifies the implementation of your prototype by suppo
 ## Quick Examples
 From String to Encoding for Encryption
 ```rust
-use qfall_tools::utils::{common_moduli::new_anticyclic, common_encodings::encode_z_bitwise_in_polynomialringzq};
+use qfall_tools::utils::{common_moduli::new_anticyclic, common_encodings::encode_value_in_polynomialringzq};
 use qfall_math::integer::Z;
 
 // Create X^256 + 1 mod 3329
-let poly_mod = new_anticyclic(256, 3329);
+let poly_mod = new_anticyclic(256, 3329).unwrap();
 // Generate integer from string
 let message = Z::from_utf8("Hello!");
-// Turn string into encoding q/2 and 0 for each 1 and 0 bit resp.
-let mu_q_half = encode_z_bitwise_in_polynomialringzq(&poly_mod, &message);
+// Turn string into encoding q/2 and 0 for each 1 and 0 bit respectively
+let mu_q_half = encode_value_in_polynomialringzq(message, 2, &poly_mod).unwrap();
 ```
 
 Preimage Sampling using a PSF

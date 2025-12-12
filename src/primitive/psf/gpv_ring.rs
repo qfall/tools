@@ -6,9 +6,9 @@
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
-//! Implements a GPV PSF over the polynomial ring according to
+//! Implements a GPV [`PSF`] over the polynomial ring according to
 //! [\[1\]](<../index.html#:~:text=[1]>) and [\[2\]](<../index.html#:~:text=[2]>)
-//! using G-Trapdoors to generate a short basis and corresponding trapdoor.
+//! using G-trapdoors to generate a short basis trapdoors.
 
 use super::PSF;
 use crate::{

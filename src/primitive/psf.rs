@@ -6,8 +6,7 @@
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
-//! Contains the [`PSF`] trait, which is then subsequently implemented by
-//! explicit constructions such as [`PSFGPV`].
+//! Contains implementations of Preimage Samplable Functions, short [`PSF`].
 //!
 //! The main references are listed in the following
 //! and will be further referenced in submodules by these numbers:

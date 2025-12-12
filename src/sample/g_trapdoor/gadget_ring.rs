@@ -7,7 +7,7 @@
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
 //! This module contains an implementation to generate a gadget trapdoor in a
-//! ring-lwe setting.
+//! Ring-LWE setting.
 
 use super::{gadget_classical::find_solution_gadget_mat, gadget_parameters::GadgetParametersRing};
 use qfall_math::{
