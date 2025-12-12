@@ -8,7 +8,7 @@
 
 //! Contains primitives that are useful for cryptographic
 //! constructions, but are solely targeted to be used in other constructions.
-//! 
+//!
 //! More specifically, this module contains primitives that do not provide security
 //! guarantees targeted at end-users such as confidentiality, integrity, etc.
 

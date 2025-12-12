@@ -21,27 +21,27 @@ use qfall_math::{
 /// across its coefficients multiplied by `q/base`.
 /// This function is commonly used in encryption algorithms of lattice-based PKE schemes
 /// and described as `⌊q/base * μ⌋`, where `μ ∈ R_{base}^n`.
-/// 
+///
 /// Parameters:
 /// - `value`: the non-negative integer value to encode
 /// - `base`: defines the encoded representation, usually chosen as 2 for binary representation
 /// - `modulus`: specifies the modulus of the returned struct and `q`
-/// 
+///
 /// Returns a [`PolynomialRingZq`] containing `⌊q/base * μ⌋` as described above or a [`MathError`]
 /// if `base < 2`, `value < 0`, or `value` represented w.r.t. `base` requires more than `modulus.get_degree()` coefficients.
-/// 
+///
 /// # Examples
 /// ```
 /// use qfall_tools::utils::common_encodings::encode_value_in_polynomialringzq;
 /// use qfall_tools::utils::common_moduli::new_anticyclic;
-/// 
+///
 /// let modulus = new_anticyclic(16, 257).unwrap();
 /// let base = 2;
 /// let value = u16::MAX;
-/// 
+///
 /// let encoded = encode_value_in_polynomialringzq(value, base, &modulus).unwrap();
 /// ```
-/// 
+///
 /// # Errors and Failures
 /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
 ///   if `value` is negative, `value` represented w.r.t. `base` has more digits than coefficients available in `modulus.get_degree()`,
@@ -93,32 +93,32 @@ pub fn encode_value_in_polynomialringzq(
 
 /// Takes an encoded [`PolynomialRingZq`] and decodes it w.r.t. `base` and `q`, effectively performing
 /// `μ = ⌈base/q * poly⌋ mod base` for `poly ∈ R_q^n`. Then, it takes any value of `μ ∈ R_{base}^n` and
-/// turns it into a non-negative integer of type [`Z`]. 
+/// turns it into a non-negative integer of type [`Z`].
 /// This function is commonly used in decryption algorithms of lattice-based PKE schemes and invers to
 /// [`encode_value_in_polynomialringzq`].
-/// 
+///
 /// Parameters:
 /// - `poly`: the [`PolynomialRingZq`] containing the encoded value
 /// - `base`: defines the encoded representation, usually chosen as 2 for binary representation
-/// 
+///
 /// Returns a [`Z`] containing the value of the vector `⌈base/q * poly⌋ mod base ∈ R_{base}^n` as a decimal number
 /// as described above or a [`MathError`] if `base < 2`.
-/// 
+///
 /// # Examples
 /// ```
 /// use qfall_tools::utils::common_encodings::{encode_value_in_polynomialringzq, decode_value_from_polynomialringzq};
 /// use qfall_tools::utils::common_moduli::new_anticyclic;
-/// 
+///
 /// let modulus = new_anticyclic(16, 257).unwrap();
 /// let base = 2;
 /// let value = u16::MAX;
-/// 
+///
 /// let encoded = encode_value_in_polynomialringzq(value, base, &modulus).unwrap();
 /// let decoded = decode_value_from_polynomialringzq(&encoded, base).unwrap();
-/// 
+///
 /// assert_eq!(value, decoded);
 /// ```
-/// 
+///
 /// # Errors and Failures
 /// - Returns a [`MathError`] of type [`InvalidIntegerInput`](MathError::InvalidIntegerInput)
 ///   if `base < 2`.

@@ -17,17 +17,17 @@
 //!   - [common message encodings for encryption](crate::utils::common_encodings),
 //!   - [quick instantiations of common moduli for rings](crate::utils::common_moduli), as well as
 //!   - [rotation matrices](crate::utils::rotation_matrix).
-//! 
+//!
 //! The `qFALL` project contains two more crates called [`qFALL-math`](https://crates.io/crates/qfall-math)
 //! and [`qFALL-schemes`](https://crates.io/crates/qfall-schemes) to support prototyping.
 //! - Find further information on [our website](https://qfall.github.io/).
 //! - We recommend [our tutorial](https://qfall.github.io/book) to start working with qFALL.
-//! 
+//!
 //! ## Quick Example
 //! ```
 //! use qfall_tools::utils::{common_moduli::new_anticyclic, common_encodings::encode_value_in_polynomialringzq};
 //! use qfall_math::integer::Z;
-//! 
+//!
 //! // Create X^256 + 1 mod 3329
 //! let poly_mod = new_anticyclic(256, 3329).unwrap();
 //! // Generate integer from string
