@@ -1,4 +1,4 @@
-# qFALL-math
+# qFALL-tools
 [<img alt="github" src="https://img.shields.io/badge/qfall--tools-github?style=for-the-badge&logo=github&label=github&color=8da0cb" height="20">](https://github.com/qfall/tools)
 [<img alt="crates.io" src="https://img.shields.io/badge/qfall--tools-cratesio?style=for-the-badge&logo=rust&label=crates&color=fc8d62" height="20">](https://crates.io/crates/qfall-tools)
 [<img alt="docs.rs" src="https://img.shields.io/badge/qfall--tools-docs?style=for-the-badge&logo=docs.rs&label=docs.rs&color=66c2a5" height="20">](https://docs.rs/qfall-tools)
@@ -25,7 +25,7 @@ cargo add qfall-tools
 - Read the [documentation of this crate](https://docs.rs/qfall-tools).
 - We recommend [our tutorial](https://qfall.github.io/book) to start working with qFALL.
 
-## What does qFALL-math offer?
+## What does qFALL-tools offer?
 qFALL-tools offers several commonly used sub-modules specific to lattice-based cryptography.
 - [Preimage Samplable Functions (PSF)](https://docs.rs/qfall-tools/latest/qfall_tools/primitive/psf/index.html)
   - [GPV-based PSF over Z_q](https://docs.rs/qfall-tools/latest/qfall_tools/primitive/psf/struct.PSFGPV.html)
@@ -103,5 +103,5 @@ This project is based on [qfall-math](https://crates.io/crates/qfall-math), whic
 
 ## License
 
-This library is distributed under the [Mozilla Public License Version 2.0](https://github.com/qfall/math/blob/dev/LICENSE).
+This library is distributed under the [Mozilla Public License Version 2.0](https://github.com/qfall/tools/blob/dev/LICENSE).
 Permissions of this weak copyleft license are conditioned on making the source code of licensed files and modifications of those files available under the same license (or in certain cases, under one of the GNU licenses). Copyright and license notices must be preserved. Contributors provide an express grant of patent rights. However, a larger work using the licensed work may be distributed under different terms and without source code for files added to the larger work.

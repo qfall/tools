@@ -8,7 +8,7 @@ readme = "README.md"
 homepage = "https://qfall.github.io"
 repository = "https://github.com/qfall/tools"
 license = "MPL-2.0"
-keywords = ["prototype", "lattice", "cryptography", "math"]
+keywords = ["prototype", "lattice", "cryptography"]
 categories = ["cryptography", "mathematics", "development-tools::build-utils", "development-tools::testing", "development-tools::profiling"]
 autobenches = false
 
