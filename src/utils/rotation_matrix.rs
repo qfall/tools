@@ -6,9 +6,8 @@
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
-//! This module includes a specialized implementation called rotation matrices,
-//! which find application in ring-based implementations for the special rings of the form
-//! `Z[X]/(X^n + 1)`.
+//! Contains functions for generating rotation matrices used
+//! when working over the ring `Z[X]/(X^n + 1)`.
 
 use qfall_math::{integer::MatZ, traits::*};
 

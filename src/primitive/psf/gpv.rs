@@ -6,8 +6,8 @@
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
-//! Implements a GPV PSF according to [\[1\]](<../index.html#:~:text=[1]>)
-//! using G-Trapdoors to generate a short basis and corresponding trapdoor.
+//! Implements a GPV [`PSF`] according to [\[1\]](<../index.html#:~:text=[1]>)
+//! using G-Trapdoors to generate a short basis trapdoors.
 
 use super::PSF;
 use crate::sample::g_trapdoor::{

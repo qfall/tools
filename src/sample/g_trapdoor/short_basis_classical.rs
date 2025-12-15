@@ -6,7 +6,7 @@
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
-//! This module contains an implementation to generate a short basis from a G-Trapdoor
+//! This module contains an implementation to generate a short basis from a G-trapdoor
 //! and its parity check matrix.
 
 use super::{

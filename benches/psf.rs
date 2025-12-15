@@ -6,10 +6,10 @@
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
-use criterion::{criterion_group, Criterion};
+use criterion::{Criterion, criterion_group};
 use qfall_math::{integer_mod_q::MatZq, rational::Q};
 use qfall_tools::{
-    primitive::psf::{PSFPerturbation, PSF, PSFGPV},
+    primitive::psf::{PSF, PSFGPV, PSFPerturbation},
     sample::g_trapdoor::gadget_parameters::GadgetParameters,
 };
 

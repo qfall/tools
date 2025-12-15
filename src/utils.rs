@@ -6,11 +6,8 @@
 // the terms of the Mozilla Public License Version 2.0 as published by the
 // Mozilla Foundation. See <https://mozilla.org/en-US/MPL/2.0/>.
 
-//! This module contains common functions that are used by sub functions.
-//!
-//! This can include specialized implementations for certain parameter sets, such as rotation matrices.
+//! This module contains commonly functions in lattice-based cryptography.
 
 pub mod common_encodings;
 pub mod common_moduli;
-pub mod lossy_compression;
 pub mod rotation_matrix;
