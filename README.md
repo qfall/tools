@@ -92,7 +92,13 @@ See [Contributing](https://github.com/qfall/tools/blob/dev/CONTRIBUTING.md) for 
 Please use the following bibtex entry to cite [qFALL](https://qfall.github.io).
 
 ```text
-TODO: Update to eprint
+@misc{qfall,
+      author = {Marvin Beckmann and Phil Milewski and Laurens Porzenheim and Marcel Luca Schmidt and Jan Niklas Siemer},
+      title = {{qFALL} – Rapid Prototyping of Lattice-based Cryptography},
+      howpublished = {Cryptology {ePrint} Archive, Paper 2026/069},
+      year = {2026},
+      url = {https://eprint.iacr.org/2026/069}
+}
 ```
 
 ## Dependencies
