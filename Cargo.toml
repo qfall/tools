@@ -2,7 +2,7 @@
 name = "qfall-tools"
 version = "0.1.0"
 edition = "2024"
-rust-version = "1.85" # due to rand and rand_distr dependency
+rust-version = "1.87" # due to wit_bindgen dependency
 description = "Common sub-modules and procedures in lattice-based constructions"
 readme = "README.md"
 homepage = "https://qfall.github.io"
