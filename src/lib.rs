@@ -1,4 +1,4 @@
-// Copyright © 2023 Niklas Siemer, Marvin Beckmann
+// Copyright 2023 Jan Niklas Siemer, Marvin Beckmann
 //
 // This file is part of qFALL-tools.
 //
