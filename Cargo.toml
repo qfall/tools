@@ -2,7 +2,7 @@
 name = "qfall-tools"
 version = "0.2.0"
 edition = "2024"
-rust-version = "1.86"
+rust-version = "1.88"
 description = "Common sub-modules and procedures in lattice-based constructions"
 readme = "README.md"
 homepage = "https://qfall.github.io"
