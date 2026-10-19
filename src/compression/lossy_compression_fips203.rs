@@ -8,7 +8,7 @@
 
 //! Implements lossy (de-)compression as specified in FIPS 203, i.e. ML-KEM / Kyber.
 
-use flint_sys::fmpz_poly::fmpz_poly_set_coeff_fmpz;
+use flint3_sys::fmpz_poly_set_coeff_fmpz;
 use qfall_math::{
     integer::{MatPolyOverZ, PolyOverZ, Z},
     integer_mod_q::{MatPolynomialRingZq, ModulusPolynomialRingZq, PolynomialRingZq},
