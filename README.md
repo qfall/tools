@@ -11,7 +11,7 @@ This `tools`-crate collects common sub-modules and features used by lattice-base
 
 ## Quick-Start
 First, ensure that you use a Unix-like distribution (Linux or MacOS). Setup [WSL](https://learn.microsoft.com/en-us/windows/wsl/install) if you're using Windows. This is required due to this crate's dependency on FLINT.
-Then, make sure your `rustc --version` is `1.87` or newer. 
+Then, make sure your `rustc --version` is `1.88` or newer. 
 
 Furthermore, it's required that `m4`, a C-compiler such as `gcc`, and `make` are installed.
 ```bash
@@ -76,6 +76,10 @@ let preimage = psf.samp_p(&a, &td, &target);
 assert!(psf.check_domain(&preimage));
 assert_eq!(a * preimage, target);
 ```
+
+## SemVer and Backward Compatibility
+While this library is not stable yet, i.e. pre-version 1.0.0, we may introduce API-breaking changes in MINOR version updates.
+Therefore, we recommend to fix the used version `version = "0.y"` in your `Cargo.toml`.
 
 ## Bugs
 Please report bugs through the [GitHub issue tracker](https://github.com/qfall/tools/issues).
